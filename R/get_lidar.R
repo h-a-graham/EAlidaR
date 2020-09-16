@@ -9,7 +9,11 @@ compose_url <- function(res, os.tile){
     stop('The resolution requested is not available options are: 0.25, 0.5, 1 and 2')
   }
 
-  sprintf('https://environment.data.gov.uk/UserDownloads/interactive/979e74aadea94482871f8baf7028c65225520/LIDARCOMP/LIDAR-DSM-%s-%s.zip', res.str, os.tile)
+  sprintf('https://environment.data.gov.uk/UserDownloads/interactive/ded85a5670bb4c80bbe5e300ba292c6a25520/LIDARCOMP/LIDAR-DSM-%s-%s.zip', res.str, os.tile)
+
+          # 'https://environment.data.gov.uk/UserDownloads/interactive/ded85a5670bb4c80bbe5e300ba292c6a25520/LIDARCOMP/LIDAR-DTM-2m-2019-SX69se.zip'
+          # 'https://environment.data.gov.uk/UserDownloads/interactive/44d4901e024a4dc18e3c448d3544ea1a98736/LIDARCOMP/LIDAR-DSM-2M-SX69ne.zip'
+
 }
 
 compose_zip_path <- function(save.folder, web.add){
@@ -81,9 +85,10 @@ get_tile <- function(resolution, os.tile.name, dest.folder, unzip.file, merge.ti
   if (merge.tiles == TRUE){
     ras.obj <- merge.ostiles(dest.path)
     if (save.tile == TRUE){
-      raster::writeRaster(ras.obj, file.path(dest.folder, os.tile.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW", "TFW=YES"))
+      raster::writeRaster(ras.obj, file.path(dest.folder, os.tile.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW"))
 
     }
+    unlink(dest.path, recursive = TRUE, force=TRUE)
     return(ras.obj)
   }
 
