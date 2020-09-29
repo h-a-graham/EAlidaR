@@ -13,6 +13,7 @@ compose_url <- function(res, os.tile){
 
           # 'https://environment.data.gov.uk/UserDownloads/interactive/ded85a5670bb4c80bbe5e300ba292c6a25520/LIDARCOMP/LIDAR-DTM-2m-2019-SX69se.zip'
           # 'https://environment.data.gov.uk/UserDownloads/interactive/44d4901e024a4dc18e3c448d3544ea1a98736/LIDARCOMP/LIDAR-DSM-2M-SX69ne.zip'
+  # 'https://environment.data.gov.uk/UserDownloads/interactive/e42cd3cb53754adbb7a6b74e8b783a4953340/LIDARCOMP/LIDAR-DTM-2m-2019-SX69se.zip
 
 }
 
