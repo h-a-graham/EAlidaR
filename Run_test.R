@@ -1,6 +1,10 @@
 library(raster)
 library(ggplot2)
 library(ggspatial)
+library(sf)
+library(lwgeom)
+library(tidyverse)
+library(zip)
 source("./R/get_lidar.R")
 
 
@@ -27,3 +31,52 @@ ggplot() +
   labs(fill='Elevation (m)')
 
 ggsave('C:/HG_Projects/SideProjects/EA_Lidar_Check/maps/SX69se.jpg')
+
+
+full_grid <- sf::read_sf('data/OSGB_Grid_5km.gpkg')
+
+
+plot(full_grid)
+
+st_geohash(full_grid, precision = 0)
+
+SX69se_grid <- full_grid %>%
+  filter(TILE_NAME == 'SX69SE')
+
+osgb_to_geohash <- function(sf.obj){
+  st_transform(sf.obj, crs = sp::CRS('+init=EPSG:4326'))%>%
+    st_geohash(., precision = 5)
+}
+
+geohash <- osgb_to_geohash(SX69se_grid)
+geohash
+
+bounds1 <- st_boundary(SX69se_grid)$geom
+bounds1[[1]]
+
+bounds2 <- st_boundary(st_transform(SX69se_grid, crs = sp::CRS('+init=EPSG:4326')))$geom
+
+sf::write_sf(SX69se_grid, 'C:/HG_Projects/SideProjects/EA_Lidar_Check/vectors/SX69se.shp')
+
+
+
+search_areas <- 'C:/HG_Projects/SideProjects/EA_Lidar_Check/vectors/OS50km_Lidar_Ext.gpkg'
+
+
+sa_gdf_shrink <- sf::read_sf(search_areas) %>%
+  st_buffer(., dist = -100) %>%
+  select(TILE_NAME, geom)
+
+plot(sa_gdf_shrink)
+
+
+TL_test <- sa_gdf_shrink %>%
+  filter(TILE_NAME == 'TLNE')
+
+plot(TL_test)
+
+sf::write_sf(TL_test, 'C:/HG_Projects/SideProjects/EA_Lidar_Check/vectors/TLNE.shp')
+filelist = Sys.glob('C:/HG_Projects/SideProjects/EA_Lidar_Check/vectors/TLNE.*')
+zip::zipr('C:/HG_Projects/SideProjects/EA_Lidar_Check/vectors/TL.zip', files = filelist)
+
+
