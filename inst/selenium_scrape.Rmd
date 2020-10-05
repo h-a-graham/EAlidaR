@@ -1,0 +1,107 @@
+---
+title: "selenium_scraping"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+
+
+#conda paths...
+conda.path <- 'C:/Users/hughg/Miniconda3/envs/R_python'
+env.name <- 'R_python'
+
+#set up python...
+use_condaenv(condaenv =conda.path, env.name, required = TRUE)
+# py_config()
+
+wd <- dirname(getwd())
+
+```
+
+### Scrape Arc Web Map Object IDs.
+This section of python uses selenium to upload zip files of 25km grids to the Defra Portal and then returns the object ID which is needed to construct the URL for that region.
+
+```{python}
+from selenium import webdriver
+import pandas as pd
+from glob import glob
+import time
+import os
+import pyautogui
+import re
+from pathlib import Path
+
+def scrapestuff():
+  link = 'https://environment.data.gov.uk/DefraDataDownload/?Mode=survey'
+  
+  work_dir = r.wd
+  search_str = os.path.join(work_dir, 'data/grid_shp_zip/Tile_*.zip')
+  zip_list = glob(search_str)
+  zip_list = [str(Path(x)) for x in zip_list]
+  # zip_list = zip_list[:2]
+  
+  # Set up firefox browser
+  browser = webdriver.Firefox(executable_path='C:/install_files/gecko/geckodriver-v0.27.0-win64/geckodriver.exe')
+  browser.get(link)
+  time.sleep(10)
+  # print(browser.title)
+  
+  dump_list = []
+  
+  for file in zip_list:
+    # get tile id number
+    tile_n = int(re.search('Tile_(.*).zip', file).group(1))
+    
+    #click on upload button
+    browser.find_element_by_css_selector('#buttonid').click()
+    time.sleep(3)
+    
+    #send file to windows pop up
+    pyautogui.write(file) 
+    pyautogui.press('enter')
+    time.sleep(5)
+    
+    # click 'get available tiles'
+    browser.find_element_by_css_selector('.grid-item-container').click()
+    time.sleep(45)
+    
+    # get first link for download
+    down_link = browser.find_element_by_css_selector('.data-ready-container > a:nth-child(1)').get_property('href')
+    
+    #retrieve arc object id from url
+    result = re.search('interactive/(.*)/LIDARCOMP', down_link).group(1)
+    
+    #reset upload window
+    browser.find_element_by_css_selector('div.result-options:nth-child(7) > input:nth-child(1)').click()
+    time.sleep(0.5)
+    
+    # create pandas dataframe from results and append to list
+    out_vals = [[tile_n, result]]
+    scrape_out = pd.DataFrame(out_vals, columns=['tile_n', 'arc_code'])
+    dump_list.append(scrape_out)
+  
+  # join list of pf dfs to single df
+  combine_dfs = pd.concat(dump_list).reset_index(drop=True)
+  
+  return combine_dfs
+  
+
+if __name__ == '__main__':
+  arc_id_df = scrapestuff()
+
+```
+
+
+Now we save the returned pandas dataframe as a csv file which will be used for constructing URLs in the package...
+
+```{r, echo=TRUE}
+# convert the pandas df object to R DF
+r_df <- reticulate::py$arc_id_df
+save_path <- file.path(wd, 'data', 'arc_ids_25km.csv')
+write.csv(r_df, file = save_path, row.names = FALSE)
+
+```
+
+
