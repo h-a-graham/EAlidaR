@@ -34,7 +34,7 @@ join_paths <- function(p1, p2){
 
 
 #' @export
-merge.ostiles <- function(ras.folder){
+merge_ostiles <- function(ras.folder){
   ras.list <- list.files(ras.folder)
   ras.list <- lapply(ras.list, join_paths, p2=ras.folder)
   ras.list <- lapply(ras.list, read_raster)
@@ -78,13 +78,13 @@ get_tile <- function(resolution, os.tile.name, dest.folder, unzip.file, merge.ti
 
   if (unzip.file == TRUE){
     exp.fold <- tools::file_path_sans_ext(dest.path)
-    unzip(zipfile = dest.path, overwrite = TRUE, exdir = exp.fold)
+    zip::unzip(zipfile = dest.path, overwrite = TRUE, exdir = exp.fold)
     unlink(dest.path, recursive = TRUE, force=TRUE)
     dest.path <- exp.fold
   }
 
   if (merge.tiles == TRUE){
-    ras.obj <- merge.ostiles(dest.path)
+    ras.obj <- merge_ostiles(dest.path)
     if (save.tile == TRUE){
       raster::writeRaster(ras.obj, file.path(dest.folder, os.tile.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW"))
 

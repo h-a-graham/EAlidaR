@@ -1,11 +1,42 @@
-library(raster)
-library(ggplot2)
-library(ggspatial)
-library(sf)
-library(lwgeom)
-library(tidyverse)
-library(zip)
-source("./R/get_lidar.R")
+# library(raster)
+# library(ggplot2)
+# library(ggspatial)
+# library(sf)
+# library(lwgeom)
+# library(tidyverse)
+# library(zip)
+devtools::document()
+devtools::load_all() # loads package functions
+
+#create the zipped files for uploading to the defra portal:
+# create_zip_tiles()
+
+
+## Scraping the required tile Arc Web Map IDs
+
+#conda env paths
+conda.p <- 'C:/Users/hughg/Miniconda3/envs/R_python'
+
+#conda env name
+env.n <- 'R_python'
+
+# Download Gecko Driver from here: https://github.com/mozilla/geckodriver/releases
+gecko.e <- 'C:/install_files/gecko/geckodriver-v0.27.0-win64/geckodriver.exe'
+
+py_out <- scrape_tile_IDs(conda_path = conda.p, env_name = env.n, gecko_exe = gecko.e)
+
+py_out$error_log
+
+review_scrape <- check_tiles(py_out)
+
+review_scrape$tile_plot
+review_scrape$missing_tile_df
+
+
+
+
+
+
 
 
 save_folder <- 'C:/HG_Projects/SideProjects/EA_Lidar_Check/EA_Download_TEST'
@@ -31,6 +62,12 @@ ggplot() +
   labs(fill='Elevation (m)')
 
 ggsave('C:/HG_Projects/SideProjects/EA_Lidar_Check/maps/SX69se.jpg')
+
+
+
+
+
+
 
 
 full_grid <- sf::read_sf('data/OSGB_Grid_5km.gpkg')
