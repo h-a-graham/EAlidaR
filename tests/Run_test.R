@@ -9,19 +9,21 @@ devtools::document()
 devtools::load_all() # loads package functions
 
 #create the zipped files for uploading to the defra portal:
-# create_zip_tiles()
+create_zip_tiles()
 
 
 ## Scraping the required tile Arc Web Map IDs
 
 #conda env paths
-conda.p <- 'C:/Users/hughg/Miniconda3/envs/R_python'
+# conda.p <- 'C:/Users/hughg/Miniconda3/envs/R_python'
+conda.p <- 'C:/Users/hg340/AppData/Local/Continuum/miniconda3/envs/R_python'
 
 #conda env name
 env.n <- 'R_python'
 
 # Download Gecko Driver from here: https://github.com/mozilla/geckodriver/releases
-gecko.e <- 'C:/install_files/gecko/geckodriver-v0.27.0-win64/geckodriver.exe'
+# gecko.e <- 'C:/install_files/gecko/geckodriver-v0.27.0-win64/geckodriver.exe'
+gecko.e <- 'C:/Installation_Files/gecko/geckodriver-v0.27.0-win64/geckodriver.exe'
 
 py_out <- scrape_tile_IDs(conda_path = conda.p, env_name = env.n, gecko_exe = gecko.e)
 

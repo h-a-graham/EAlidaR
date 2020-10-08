@@ -23,7 +23,7 @@ def scrapestuff(gecko_exe, work_dir):
   search_str = os.path.join(work_dir, 'data/grid_shp_zip/Tile_*.zip')
   zip_list = glob(search_str)
   zip_list = [str(Path(x)) for x in zip_list]
-  # zip_list = zip_list[:3]  # Use this line for testing/debugging
+  zip_list = zip_list[:15]  # Use this line for testing/debugging
   
   # we must chunk up the list to avoid the limit of 10 uploads per session...
   zip_chunks = chunks(zip_list, 10)
@@ -32,19 +32,20 @@ def scrapestuff(gecko_exe, work_dir):
   fail_list = []
   dump_list = []
   
+  # Set up Firefox browser
+  browser = webdriver.Firefox(executable_path = gecko_exe)
+  # browser.implicitly_wait(10)
+  browser.get(link)
+  
+  
   for chunk in zip_chunks:
-    # Set up Firefox browser
-    browser = webdriver.Firefox(executable_path = gecko_exe)
-    # browser.implicitly_wait(10)
-    browser.get(link)
-    time.sleep(20)
-    
+    time.sleep(30)
     for file in chunk:
       # get tile id number
       tile_n = int(re.search('Tile_(.*).zip', file).group(1))
       # print(tile_n)
       try:
-        time.sleep(10)
+        time.sleep(5)
         #click on upload button
         browser.find_element_by_css_selector('#buttonid').click()
         time.sleep(1)
@@ -92,8 +93,10 @@ def scrapestuff(gecko_exe, work_dir):
         fail_list.append(error_out_pd)
         
         pass
-        
-    browser.quit()
+    
+    browser.refresh()  
+  
+  browser.quit()
   
   # join list of pf dfs to single df
   try:
