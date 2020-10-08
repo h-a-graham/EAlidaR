@@ -2,3 +2,4 @@
 .Rhistory
 .Rbuildignore
 geckodriver.log
+rosm.cache
