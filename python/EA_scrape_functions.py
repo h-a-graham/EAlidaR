@@ -1,5 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 import pyautogui
 import pandas as pd
 import math
@@ -12,6 +17,7 @@ from pathlib import Path
 from datetime import datetime
 import warnings
 
+pyautogui.FAILSAFE = False # getting some errors when turning off screen...
 
 def scrapestuff(gecko_exe, work_dir):
   
@@ -23,7 +29,7 @@ def scrapestuff(gecko_exe, work_dir):
   search_str = os.path.join(work_dir, 'data/grid_shp_zip/Tile_*.zip')
   zip_list = glob(search_str)
   zip_list = [str(Path(x)) for x in zip_list]
-  zip_list = zip_list[:15]  # Use this line for testing/debugging
+  zip_list = zip_list[:13]  # Use this line for testing/debugging
   
   # we must chunk up the list to avoid the limit of 10 uploads per session...
   zip_chunks = chunks(zip_list, 10)
@@ -34,39 +40,55 @@ def scrapestuff(gecko_exe, work_dir):
   
   # Set up Firefox browser
   browser = webdriver.Firefox(executable_path = gecko_exe)
-  # browser.implicitly_wait(10)
+  browser.implicitly_wait(20)
   browser.get(link)
   
   
   for chunk in zip_chunks:
-    time.sleep(30)
+    
+    WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#polygon')))
+    
+    
     for file in chunk:
+      
       # get tile id number
       tile_n = int(re.search('Tile_(.*).zip', file).group(1))
-      # print(tile_n)
+      
       try:
-        time.sleep(5)
+        
         #click on upload button
-        browser.find_element_by_css_selector('#buttonid').click()
-        time.sleep(1)
+        # browser.find_element_by_css_selector('#buttonid').click()
+        WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
+        WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
+        # WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(3)')))
+        WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#buttonid'))).click()
+        
         
         #send file to windows pop up
+        time.sleep(1)
         pyautogui.write(file) 
-        time.sleep(3)
+        time.sleep(1)
         pyautogui.press('enter')
-        time.sleep(6)
+        time.sleep(1)
         
         # click 'get available tiles'
-        browser.find_element_by_css_selector('.grid-item-container').click()
-        time.sleep(45)
+        WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
+        WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
+        # WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(3)')))
+        # browser.find_element_by_css_selector('.grid-item-container').click()
+        WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.grid-item-container'))).click()
+        # time.sleep(35)
         
         #select DTM
         # browser.find_element_by_css_selector('#productSelect').click()
-        
+        WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
+        WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
+        # time.sleep(2)
         select = Select(browser.find_element_by_css_selector('#productSelect'))
-        time.sleep(3)
+        time.sleep(1)
         select.select_by_visible_text('LIDAR Composite DTM')
-        time.sleep(2)
+        time.sleep(1)
+        
           
         # get first link for download
         down_link = browser.find_element_by_css_selector('.data-ready-container > a:nth-child(1)').get_property('href')
