@@ -17,7 +17,7 @@ from pathlib import Path
 from datetime import datetime
 import warnings
 
-pyautogui.FAILSAFE = False # getting some errors when turning off screen...
+# pyautogui.FAILSAFE = False # getting some errors when turning off screen...
 
 def scrapestuff(gecko_exe, work_dir):
   
@@ -29,7 +29,7 @@ def scrapestuff(gecko_exe, work_dir):
   search_str = os.path.join(work_dir, 'data/grid_shp_zip/Tile_*.zip')
   zip_list = glob(search_str)
   zip_list = [str(Path(x)) for x in zip_list]
-  zip_list = zip_list[:13]  # Use this line for testing/debugging
+  # zip_list = zip_list[:13]  # Use this line for testing/debugging
   
   # we must chunk up the list to avoid the limit of 10 uploads per session...
   zip_chunks = chunks(zip_list, 10)
@@ -56,11 +56,9 @@ def scrapestuff(gecko_exe, work_dir):
       
       try:
         
-        #click on upload button
-        # browser.find_element_by_css_selector('#buttonid').click()
+        # Wait for loading screen to go and then click on upload button
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
-        # WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(3)')))
         WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#buttonid'))).click()
         
         
@@ -71,19 +69,16 @@ def scrapestuff(gecko_exe, work_dir):
         pyautogui.press('enter')
         time.sleep(1)
         
-        # click 'get available tiles'
+        # Wait for loading screen to go and then click 'get available tiles'
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
-        # WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(3)')))
-        # browser.find_element_by_css_selector('.grid-item-container').click()
         WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.grid-item-container'))).click()
         # time.sleep(35)
         
-        #select DTM
-        # browser.find_element_by_css_selector('#productSelect').click()
+        # Wait for loading screen to go and then select DTM
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
-        # time.sleep(2)
+
         select = Select(browser.find_element_by_css_selector('#productSelect'))
         time.sleep(1)
         select.select_by_visible_text('LIDAR Composite DTM')
@@ -129,7 +124,7 @@ def scrapestuff(gecko_exe, work_dir):
   
   try:
     combine_errs = pd.concat(fail_list).reset_index(drop=True)
-    warnings.warn('Errors have occurred - check Error log with py$error_df')
+    warnings.warn('Errors have occurred - check Error log with .$error_df')
   except Exception:
     print('No Errors Occurred - YAY!!')
     combine_errs = []
