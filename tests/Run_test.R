@@ -6,10 +6,12 @@
 # library(tidyverse)
 # library(zip)
 devtools::document()
+# devtools::uninstall()
 devtools::load_all() # loads package functions
 
 #create the zipped files for uploading to the defra portal:
-create_zip_tiles()
+
+# create_zip_tiles()
 
 
 ## Scraping the required tile Arc Web Map IDs
@@ -28,7 +30,7 @@ gecko.e <- 'C:/Installation_Files/gecko/geckodriver-v0.27.0-win64/geckodriver.ex
 py_out <- scrape_tile_IDs(conda_path = conda.p, env_name = env.n, gecko_exe = gecko.e)
 
 py_out$error_log
-
+py_out$arc_ids
 review_scrape <- check_tiles(py_out)
 
 review_scrape$tile_plot
