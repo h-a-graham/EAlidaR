@@ -43,7 +43,7 @@ def scrapestuff(gecko_exe, work_dir):
   browser.implicitly_wait(20)
   browser.get(link)
   
-  
+  #             '.error' # this is the css selector for the error frame - may be worth adding in some kind of if 
   for chunk in zip_chunks:
     
     WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#polygon')))
