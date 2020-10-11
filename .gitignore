@@ -3,3 +3,5 @@
 .Rbuildignore
 geckodriver.log
 rosm.cache
+**.gpkg-shm
+**.gpkg-wal
