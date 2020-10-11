@@ -25,13 +25,13 @@ create_zip_tiles <- function(){
 direc <- file.path('data/grid_shp_zip')
 dir.create(direc, showWarnings = FALSE)
 
-grid_5km.path <- 'data/5km_Grid_LiDAR_inter.gpkg'
+grid_10km.path <- 'data/10km_Grid_LiDAR_inter.gpkg'
 
-grid_5km <- sf::read_sf(grid_5km.path) %>%
+grid_10km <- sf::read_sf(grid_10km.path) %>%
   dplyr::select(grid_id, geom)
 
-sf::st_geometry(grid_5km)%>%
-  purrr::map(~ zip_shp(.val = ., .path = direc, .sfObj = grid_5km))
+sf::st_geometry(grid_10km)%>%
+  purrr::map(~ zip_shp(.val = ., .path = direc, .sfObj = grid_10km))
 
 }
 
