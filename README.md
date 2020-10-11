@@ -6,10 +6,16 @@ So this package is very much in development...
 
 ### key issue is:
 
-In order to extract the relevant arc webmap object ID codes, I had hoped to use selenium (via docker) to drive the EA portal and iteratively upload the zipped shp files to the site and then scrape the codes.
+Scraping workflow is now close to completion... Uses python slenium to interact with the Dfra portal.
 
-Thse codes could then be saved in a database which would then allow for them to be called when a requested region intersects that shape.
+plan is to upload each of the 10km OS grid tiles to the portal and retrive Arc Web Map object id.
 
-However, I am struggling to get the upload to work - thisrequires either a drag and drop into the drop-area frame or input into the windows popup that appears when the upload button is clicked. However, I can't work out how to do this in selenium. Perhpas there is a Javascript insert that could be injected (such as the one in the javasrcipt folder)
+then this will intercect 4 5km tiles which can then be selected and extracted - composing the url from the Arc ID.
 
-Will return to this when I get time...
+
+Things that need adding: 
+- argument for 'so far completed' tile dataframe - then seleciting all tiles not completed to continue with. (perhaps not required if everything goes siwmiingly but it won't.
+
+- Then need to write a 'Get area' module which reads in either an sf object or sf-readable file and returns the raster (files) for the area - include option to crop to extent?
+
+- update the url generation - will need to do spatial join between 5km (intersecting lidar extent) and 10km grid then send codes...

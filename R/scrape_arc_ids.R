@@ -37,7 +37,7 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe){
 #' @export
 check_tiles <- function(.scrape_out){
 
-  grid_sf <- sf::read_sf('data/5km_Grid_LiDAR_inter.gpkg') %>%
+  grid_sf <- sf::read_sf('data/10km_Grid_LiDAR_inter.gpkg') %>%
     # tibble::rownames_to_column(var = "grid_id") %>%
     dplyr::mutate(grid_id = as.numeric(grid_id))%>%
     dplyr::left_join(., .scrape_out$arc_ids, by = c("grid_id"= "tile_n")) %>%
@@ -73,10 +73,10 @@ check_tiles <- function(.scrape_out){
 
 
 #' @export
-save_arc_IDs <- function(.dataframe){
+save_arc_IDs <- function(scrape.obj){
 # convert the pandas DF object to R DF and save as RDS
-r_df <- reticulate::py$arc_id_df
-save_path <- file.path(wd, 'data', 'arc_ids_5km.rds')
+r_df <- scrape.obj$arc_ids
+save_path <- file.path('data/arc_ids_10km.rds')
 saveRDS(r_df, file = save_path)
 return(readRDS(save_path))
 }
