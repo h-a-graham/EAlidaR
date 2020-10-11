@@ -39,13 +39,17 @@ def scrapestuff(gecko_exe, work_dir):
   dump_list = []
   
   # Set up Firefox browser
-  browser = webdriver.Firefox(executable_path = gecko_exe)
-  browser.implicitly_wait(20)
-  browser.get(link)
+  # browser = webdriver.Firefox(executable_path = gecko_exe)
+  # browser.implicitly_wait(20)
+  # browser.get(link)
   
-  #             '.error' # this is the css selector for the error frame - may be worth adding in some kind of if 
+  #             '.error' # this is the css selector for the error frame - may be worth adding in some kind of if consider while loop?
+  
+  
   for chunk in zip_chunks:
-    
+    browser = webdriver.Firefox(executable_path = gecko_exe)
+    browser.implicitly_wait(20)
+    browser.get(link)
     WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#polygon')))
     
     
@@ -65,7 +69,7 @@ def scrapestuff(gecko_exe, work_dir):
         #send file to windows pop up
         time.sleep(1)
         pyautogui.write(file) 
-        time.sleep(1)
+        time.sleep(2)
         pyautogui.press('enter')
         time.sleep(1)
         
@@ -111,9 +115,10 @@ def scrapestuff(gecko_exe, work_dir):
         
         pass
     
-    browser.refresh()  
+    browser.quit()
+    # browser.refresh()  
   
-  browser.quit()
+  # browser.quit()
   
   # join list of pf dfs to single df
   try:
