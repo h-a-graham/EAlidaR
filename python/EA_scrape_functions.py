@@ -19,16 +19,16 @@ import warnings
 
 # pyautogui.FAILSAFE = False # getting some errors when turning off screen...
 
-def scrapestuff(gecko_exe, work_dir):
+def scrapestuff(gecko_exe, zip_list):
   
   startTime = datetime.now() # start timer
   
   link = 'https://environment.data.gov.uk/DefraDataDownload/?Mode=survey'
   
   # work_dir = r.wd
-  search_str = os.path.join(work_dir, 'data/grid_shp_zip/Tile_*.zip')
-  zip_list = glob(search_str)
-  zip_list = [str(Path(x)) for x in zip_list]
+  # search_str = os.path.join(work_dir, 'data/grid_shp_zip/Tile_*.zip')
+  # zip_list = glob(search_str)
+  # zip_list = [str(Path(x)) for x in zip_list]
   # zip_list = zip_list[:13]  # Use this line for testing/debugging
   
   # we must chunk up the list to avoid the limit of 10 uploads per session...
@@ -67,11 +67,11 @@ def scrapestuff(gecko_exe, work_dir):
         
         
         #send file to windows pop up
-        time.sleep(1)
+        time.sleep(2)
         pyautogui.write(file) 
         time.sleep(2)
         pyautogui.press('enter')
-        time.sleep(1)
+        time.sleep(2)
         
         # Wait for loading screen to go and then click 'get available tiles'
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
@@ -82,28 +82,49 @@ def scrapestuff(gecko_exe, work_dir):
         # Wait for loading screen to go and then select DTM
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
-
+        
+        
+        ##### WORK TO BE DONE HERE!!!! FIX THIS TO CHECK IF DATA EXISTS...
         select = Select(browser.find_element_by_css_selector('#productSelect'))
-        time.sleep(1)
-        select.select_by_visible_text('LIDAR Composite DTM')
-        time.sleep(1)
         
+        # WebDriverWait(browser, 10).until(EC.element_to_be_selected(select.options[0]))
+
+        options = select.options
+        
+        option_list = []
+        for index in range(1, len(options)-1):
+            option_list.append(options[index].text)
+        
+        if 'LIDAR Composite DTM' in option_list:
+          # print('YAY')
+        
+        
+          # time.sleep(1)
+          select.select_by_visible_text('LIDAR Composite DTM')
+          time.sleep(1)
           
-        # get first link for download
-        down_link = browser.find_element_by_css_selector('.data-ready-container > a:nth-child(1)').get_property('href')
-        
-        #retrieve arc object id from url
-        result = re.search('interactive/(.*)/LIDARCOMP', down_link).group(1)
-        
-        #reset upload window
-        browser.find_element_by_css_selector('div.result-options:nth-child(7) > input:nth-child(1)').click()
-        
-        
-        # create pandas dataframe from results and append to list
-        out_vals = [[tile_n, result]]
-        scrape_out = pd.DataFrame(out_vals, columns=['tile_n', 'arc_code'])
-        dump_list.append(scrape_out)
-      
+          # down_link = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,'.data-ready-container > a:nth-child(1)')).get_property('href')  
+          # get first link for download
+          down_link = browser.find_element_by_css_selector('.data-ready-container > a:nth-child(1)').get_property('href')
+          
+          #retrieve arc object id from url
+          result = re.search('interactive/(.*)/LIDARCOMP', down_link).group(1)
+          
+          #reset upload window
+          browser.find_element_by_css_selector('div.result-options:nth-child(7) > input:nth-child(1)').click()
+          
+          
+          # create pandas dataframe from results and append to list
+          out_vals = [[tile_n, result]]
+          scrape_out = pd.DataFrame(out_vals, columns=['tile_n', 'arc_code'])
+          dump_list.append(scrape_out)
+        else:
+          #reset upload window
+          browser.find_element_by_css_selector('div.result-options:nth-child(7) > input:nth-child(1)').click()
+          
+          out_vals = [[tile_n, 'NO_DTM_COMP']] # temp solution...
+          scrape_out = pd.DataFrame(out_vals, columns=['tile_n', 'arc_code'])
+          dump_list.append(scrape_out)
       
     
       except Exception as e:

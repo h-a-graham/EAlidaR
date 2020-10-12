@@ -29,7 +29,6 @@ gecko.e <- 'C:/Installation_Files/gecko/geckodriver-v0.27.0-win64/geckodriver.ex
 
 py_out <- scrape_tile_IDs(conda_path = conda.p, env_name = env.n, gecko_exe = gecko.e)
 
-
 # Check results
 py_out$error_log
 py_out$arc_ids
@@ -38,11 +37,14 @@ review_scrape <- check_tiles(py_out)
 review_scrape$tile_plot
 review_scrape$missing_tile_df
 
-save_arc_IDs(py_out)
+py_out2 <- scrape_tile_IDs(conda_path = conda.p, env_name = env.n, gecko_exe = gecko.e, previous=py_out)
 
+py_out3 <- scrape_tile_IDs(conda_path = conda.p, env_name = env.n, gecko_exe = gecko.e, previous=py_out2)
 
+review_scrape <- check_tiles(py_out3)
 
-
+review_scrape$tile_plot
+save_arc_IDs(py_out3)
 
 
 
