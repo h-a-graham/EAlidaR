@@ -18,9 +18,9 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
   question1 <- readline("Are you sure you want to run this? (Y/N)")
 
   if(regexpr(question1, 'y', ignore.case = TRUE) == 1){
-    print("Running 'scrape_tile_IDs' - this may take a while...")
+    message("Running 'scrape_tile_IDs' - this may take a while...")
   }else{
-    print("Execution of 'scrape_tile_IDs' cancelled")
+    message("Execution of 'scrape_tile_IDs' cancelled")
     return()
   }
 
@@ -124,7 +124,31 @@ saveRDS(scrape.obj, file = save_path)
 }
 
 
+scrape_to_sf <- function(scrape.obj){
 
+
+  arc_id_df <- scrape.obj$arc_ids %>%
+    dplyr::filter(arc_code != 'False' | arc_code != 'No 2019 Data')
+
+  grid_sf <- sf::read_sf('data/10km_Grid_LiDAR_inter.gpkg') %>%
+    dplyr::right_join(., arc_id_df, by = c("grid_id"= "tile_n"))
+
+  coverage_plot <- ggplot2::ggplot() +
+    # loads background map tiles from a tile source - rosm::osm.types() for osm options
+    ggspatial::annotation_map_tile(type = "cartolight", zoomin = -1, ) +
+
+    # raster layers train scales and get projected automatically
+    ggspatial::layer_spatial(grid_sf, ggplot2::aes(fill = Retrieved), alpha = 0.5, fill = '#366BF7', colour="#BAC0BC")+
+
+    ggplot2::coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
+
+    ggplot2::labs(subtitle = stringr::str_c('10km Tile Coverage'))
+
+  save_path <- file.path('data/coverage_10km_sf.rds')
+  saveRDS(grid_sf, file = save_path)
+
+  return(list(cover_plot = coverage_plot, cover_sf = readRDS(save_path)))
+}
 
 
 
