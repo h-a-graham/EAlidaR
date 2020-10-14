@@ -4,10 +4,12 @@
 \alias{save_arc_IDs}
 \title{Save the output of scrape_tile_IDs()}
 \usage{
-save_arc_IDs(scrape.obj)
+save_arc_IDs(scrape.obj, out.path)
 }
 \arguments{
 \item{scrape.obj}{The object produced from scrape_tile_IDs()}
+
+\item{out.path}{the save path for the file - use a .rds extension}
 }
 \description{
 This function should not be required by the user. It saves the scrape_tile_IDs() in case you need to pick it up again later...

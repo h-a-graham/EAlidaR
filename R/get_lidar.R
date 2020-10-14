@@ -3,11 +3,12 @@
 get_arc_id <- function(tile.string){
   req_tile <- stringr::str_to_upper(tile.string)
 
-  t10km_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
-  tiles_10km <- readRDS(t10km_path)
+  # print(coverage_10km_sf)
+  # t10km_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
+  tiles_10km <- coverage_10km_sf
 
-  t5km_path <- system.file('data', 'tile_within10km.rds', package = "EAlidaR")
-  tiles_5km <- readRDS(t5km_path)
+  # t5km_path <- system.file('data', 'tile_within10km.rds', package = "EAlidaR")
+  tiles_5km <- tile_within10km
 
   sf::st_agr(tiles_10km) = "constant"
   sf::st_agr(tiles_5km) = "constant"
@@ -84,7 +85,7 @@ merge_ostiles <- function(ras.folder){
 
 #' Get DTM or DSM Data for a 5km Ordnance Survey (OS) Tile
 #'
-#' This function downloads Raster data from the DEFRA portal https://environment.data.gov.uk/DefraDataDownload/?Mode=survey.
+#' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
 #' It retrieves all available data within the requested OS tile defined by os.tile.name. This function only works across one tile;
 #' if additional rasters are desired get_area() is recomended.
 #'
@@ -169,7 +170,7 @@ resave_rasters <- function(ras, folder, ras_format){
 
 #' Get DTM or DSM data for an Area
 #'
-#' This function downloads Raster data from the DEFRA portal https://environment.data.gov.uk/DefraDataDownload/?Mode=survey.
+#' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
 #' It retrieves all available data within the requested area defined by poly_area and offers some additional functionality to
 #' merge and crop the raster if desired. This function uses the get_tile function to extract all tiles that intersect the
 #' desired region.
@@ -237,7 +238,8 @@ get_area <- function(poly_area, resolution, model.type, merge.tiles, crop, dest.
     ras.format <- "GTiff"
   }
 
-  tiles_5km <- readRDS('data/tile_within10km.rds')
+  # tiles_5km <- readRDS('data/tile_within10km.rds')
+  tiles_5km <- tile_within10km
 
   sf::st_agr(sf_geom) = "constant"
   sf::st_agr(tiles_5km) = "constant"

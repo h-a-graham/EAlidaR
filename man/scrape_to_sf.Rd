@@ -4,10 +4,12 @@
 \alias{scrape_to_sf}
 \title{Save the output of scrape_tile_IDs()}
 \usage{
-scrape_to_sf(scrape.obj)
+scrape_to_sf(scrape.obj, out.path)
 }
 \arguments{
 \item{scrape.obj}{The object produced from scrape_tile_IDs()}
+
+\item{out.path}{the save path for the file - use a .rds extension}
 }
 \value{
 named list containing $coverplot a ggplot object and $cover_sf the sf object with joined arc ID values.
