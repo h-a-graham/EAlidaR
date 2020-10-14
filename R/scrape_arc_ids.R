@@ -16,7 +16,7 @@ string_match <- function(string){
 #'
 #' @param conda_path A character string for the filepath to the appropriate Conda environment.
 #' @param env_name character - the name of that conda environment.
-#' @param gecko_exe file path to the gecko executable - download from here: https://github.com/mozilla/geckodriver/releases
+#' @param gecko_exe file path to the gecko executable - download from here: \url{https://github.com/mozilla/geckodriver/releases}
 #' @param previous This function never works first time for many reasons so this allows for the inclusion of outputs from previous attempts so
 #' they don't need to be re run.
 #' @return A named list containing two data frames $error_log and $arc_ids.
@@ -100,9 +100,9 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
 #' @export
 check_tiles <- function(.scrape_out){
 
-  gridpath <- system.file('data', '10km_Grid_LiDAR_inter.gpkg', package = "EAlidaR")
+  # gridpath <- system.file('data', '10km_Grid_LiDAR_inter.gpkg', package = "EAlidaR")
 
-  grid_sf <- sf::read_sf(gridpath) %>%
+  grid_sf <- km10_Grid_LiDAR_inter %>%
     # tibble::rownames_to_column(var = "grid_id") %>%
     dplyr::mutate(grid_id = as.numeric(grid_id))%>%
     dplyr::left_join(., .scrape_out$arc_ids, by = c("grid_id"= "tile_n")) %>%
@@ -143,12 +143,11 @@ check_tiles <- function(.scrape_out){
 #' This function should not be required by the user. It saves the scrape_tile_IDs() in case you need to pick it up again later...
 #'
 #' @param scrape.obj The object produced from scrape_tile_IDs()
+#' @param out.path the save path for the file - use a .rds extension
 #' @export
-save_arc_IDs <- function(scrape.obj){
-# option to save scrape objectect (including error log - allowing for repeat runs)
-save_path <- file.path('data/arc_ids_10km.rds')
+save_arc_IDs <- function(scrape.obj, out.path){
+save_path <- paste(tools::file_path_sans_ext(out.path), '.rds',sep="")
 saveRDS(scrape.obj, file = save_path)
-# return(readRDS(save_path))
 }
 
 #' Save the output of scrape_tile_IDs()
@@ -158,9 +157,10 @@ saveRDS(scrape.obj, file = save_path)
 #' available.
 #'
 #' @param scrape.obj The object produced from scrape_tile_IDs()
+#' @param out.path the save path for the file - use a .rds extension
 #' @return named list containing $coverplot a ggplot object and $cover_sf the sf object with joined arc ID values.
 #' @export
-scrape_to_sf <- function(scrape.obj){
+scrape_to_sf <- function(scrape.obj, out.path){
 
 
   arc_id_df <- scrape.obj$arc_ids %>%
@@ -180,7 +180,8 @@ scrape_to_sf <- function(scrape.obj){
 
     ggplot2::labs(subtitle = stringr::str_c('10km Tile Coverage'))
 
-  save_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
+  # save_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
+  save_path <- paste(tools::file_path_sans_ext(out.path), '.rds',sep="")
 
   saveRDS(grid_sf, file = save_path)
 

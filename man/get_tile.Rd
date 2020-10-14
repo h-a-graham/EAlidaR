@@ -31,7 +31,7 @@ get_tile(
 A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 }
 \description{
-This function downloads Raster data from the DEFRA portal https://environment.data.gov.uk/DefraDataDownload/?Mode=survey.
+This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
 It retrieves all available data within the requested OS tile defined by os.tile.name. This function only works across one tile;
 if additional rasters are desired get_area() is recomended.
 }

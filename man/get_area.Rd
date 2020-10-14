@@ -37,7 +37,7 @@ get_area(
 A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 }
 \description{
-This function downloads Raster data from the DEFRA portal https://environment.data.gov.uk/DefraDataDownload/?Mode=survey.
+This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
 It retrieves all available data within the requested area defined by poly_area and offers some additional functionality to
 merge and crop the raster if desired. This function uses the get_tile function to extract all tiles that intersect the
 desired region.

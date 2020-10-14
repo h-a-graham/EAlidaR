@@ -5,4 +5,4 @@ geckodriver.log
 rosm.cache
 **.gpkg-shm
 **.gpkg-wal
-data/grid_shp_zip/*
+tests/grid_shp_zip/*

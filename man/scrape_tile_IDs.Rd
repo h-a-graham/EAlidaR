@@ -11,7 +11,7 @@ scrape_tile_IDs(conda_path, env_name, gecko_exe, previous)
 
 \item{env_name}{character - the name of that conda environment.}
 
-\item{gecko_exe}{file path to the gecko executable - download from here: https://github.com/mozilla/geckodriver/releases}
+\item{gecko_exe}{file path to the gecko executable - download from here: \url{https://github.com/mozilla/geckodriver/releases}}
 
 \item{previous}{This function never works first time for many reasons so this allows for the inclusion of outputs from previous attempts so
 they don't need to be re run.}
