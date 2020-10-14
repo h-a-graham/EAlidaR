@@ -20,18 +20,26 @@ zip_shp <- function(.val, .path, .sfObj){
   purrr::map(filelist, file.remove)
 }
 
+
+#' Generate Zipped ESRI shapefiles (.shp) for all 10km OS grids that intersect any lidar data
+#'
+#' This function should not be required by the user. It generates the numerous >1500 zipped shp files that need to be uploaded
+#' to the DEFRA portal in order to scrape the Arc Web IDs in scrape_tile_IDs().
+#'
+#' @return A list the zipped paths.
 #' @export
 create_zip_tiles <- function(){
-direc <- file.path('data/grid_shp_zip')
-dir.create(direc, showWarnings = FALSE)
+  datadirec <- system.file('data', package = "EAlidaR")
+  direc <- file.path(datadirec, 'grid_shp_zip')
+  dir.create(direc, showWarnings = FALSE)
 
-grid_10km.path <- 'data/10km_Grid_LiDAR_inter.gpkg'
+  grid_10km.path <- system.file('data', '10km_Grid_LiDAR_inter.gpkg', package = "EAlidaR")
 
-grid_10km <- sf::read_sf(grid_10km.path) %>%
-  dplyr::select(grid_id, geom)
+  grid_10km <- sf::read_sf(grid_10km.path) %>%
+    dplyr::select(grid_id, geom)
 
-sf::st_geometry(grid_10km)%>%
-  purrr::map(~ zip_shp(.val = ., .path = direc, .sfObj = grid_10km))
+  sf::st_geometry(grid_10km)%>%
+    purrr::map(~ zip_shp(.val = ., .path = direc, .sfObj = grid_10km))
 
 }
 
