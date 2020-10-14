@@ -23,4 +23,30 @@ The most useful function will, for most people, be 'EAlidaR::get_area' which all
 `EA_raster <- get_area(poly_area = poly_sf, resolution = 2, model.type = 'DTM', merge.tiles=TRUE, crop=TRUE, dest.folder = save_folder, out.name = 'TESTAREA')`
 
 
-### Use Examples
+### Introduction
+
+Here is a simple use case where we download the available 2m DTM data for the example region provided with the package `DerwentHeadwater`. using the `get_area` function we retrieve a single raster as 'merge.tiles' is TRUE. We can save this data in a desired location with 'dest.folder' and 'out.name' arguments but in this case rasters are stored in the `tempfile()` location and will be available only during the active R session (unless subsequently saved with `raster::writeRaster`).
+We then plot the data using the excellent ggplot and ggspatial packages see here for more cool ideas for plotting spatial data in R here: https://github.com/paleolimbot/ggspatial 
+
+```
+library(EAlidaR)
+library(ggplot2)
+library(ggspatial)
+
+rasAreaTest <- get_area(poly_area = DerwentHeadwater, resolution = 2, model.type = 'DTM', merge.tiles=TRUE, crop=TRUE)
+
+ggplot() +
+  # loads background map tiles from a tile source - rosm::osm.types() for osm options
+  annotation_map_tile(type = "hillshade", zoomin = -1) +
+  # requested area
+  annotation_spatial(DerwentHeadwater, size = 2, col = "black") +
+  # raster layer
+  layer_spatial(rasAreaTest, alpha = 0.6) +
+  # make no data values transparent
+  scale_fill_distiller(na.value = NA, name='Elevation (m)') +
+  # get real coords
+  coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
+  theme_bw()
+```
+![Derwent Headwater Example](/man/figures/README_example.png)
+
