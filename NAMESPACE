@@ -2,8 +2,9 @@
 
 export(check_tiles)
 export(create_zip_tiles)
+export(get_area)
 export(get_tile)
-export(merge_ostiles)
 export(save_arc_IDs)
 export(scrape_tile_IDs)
+export(scrape_to_sf)
 importFrom(magrittr,"%>%")

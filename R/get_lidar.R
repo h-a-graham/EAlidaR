@@ -1,19 +1,47 @@
 
-compose_url <- function(res, os.tile){
+
+get_arc_id <- function(tile.string){
+  req_tile <- stringr::str_to_upper(tile.string)
+
+  # print(coverage_10km_sf)
+  # t10km_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
+  tiles_10km <- coverage_10km_sf
+
+  # t5km_path <- system.file('data', 'tile_within10km.rds', package = "EAlidaR")
+  tiles_5km <- tile_within10km
+
+  sf::st_agr(tiles_10km) = "constant"
+  sf::st_agr(tiles_5km) = "constant"
+
+  tile_id <- tiles_5km %>%
+    dplyr::filter(TILE_NAME == req_tile) %>%
+    sf::st_buffer(., -100)%>%
+    sf::st_intersection(tiles_10km) %>%
+    dplyr::pull(arc_code)
+
+  return(tile_id)
+
+}
+
+
+compose_url <- function(res, os.tile, mod.type){
 
   if (res == 1 || res == 2){
     res.str <- sprintf('%sM',res)
-  } else if (res == 0.25 || res == 0.5){
-    res.str <- sprintf('%sCM',res)
+  } else if (res == 0.25 || res == res_cm){
+    res_cm <- res * 100
+    res.str <- sprintf('%sCM',res_cm)
   } else {
     stop('The resolution requested is not available options are: 0.25, 0.5, 1 and 2')
   }
 
-  sprintf('https://environment.data.gov.uk/UserDownloads/interactive/ded85a5670bb4c80bbe5e300ba292c6a25520/LIDARCOMP/LIDAR-DSM-%s-%s.zip', res.str, os.tile)
+  arc_web_id <- get_arc_id(os.tile)
 
-          # 'https://environment.data.gov.uk/UserDownloads/interactive/ded85a5670bb4c80bbe5e300ba292c6a25520/LIDARCOMP/LIDAR-DTM-2m-2019-SX69se.zip'
-          # 'https://environment.data.gov.uk/UserDownloads/interactive/44d4901e024a4dc18e3c448d3544ea1a98736/LIDARCOMP/LIDAR-DSM-2M-SX69ne.zip'
-  # 'https://environment.data.gov.uk/UserDownloads/interactive/e42cd3cb53754adbb7a6b74e8b783a4953340/LIDARCOMP/LIDAR-DTM-2m-2019-SX69se.zip
+  if (mod.type == 'DTM'){
+    download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2019-%s.zip', arc_web_id, res.str, os.tile)
+  } else if (mod.type == 'DSM') {
+    download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DSM-%s-%s.zip', arc_web_id, res.str, os.tile)
+  }
 
 }
 
@@ -33,65 +61,238 @@ join_paths <- function(p1, p2){
 }
 
 
-#' @export
+
 merge_ostiles <- function(ras.folder){
   ras.list <- list.files(ras.folder)
+  ras.list <- purrr::discard(ras.list , grepl(".tif.xml|.tfw|index", ras.list ))
+
   ras.list <- lapply(ras.list, join_paths, p2=ras.folder)
-  ras.list <- lapply(ras.list, read_raster)
-  ras.merge <- do.call(raster::merge, ras.list)
-  raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700')   #'+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +units=m +no_defs'
+
+  if (length(ras.list) > 1){
+    ras.list <- lapply(ras.list, read_raster)
+    ras.merge <- do.call(raster::merge, ras.list)
+  } else if(length(ras.list) == 1){
+
+    ras.merge <- raster::raster(file.path(ras.list[[1]]))
+
+  }
+
+  raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700')
+
+
   return(ras.merge)
 }
 
-
+#' Get DTM or DSM Data for a 5km Ordnance Survey (OS) Tile
+#'
+#' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
+#' It retrieves all available data within the requested OS tile defined by os.tile.name. This function only works across one tile;
+#' if additional rasters are desired get_area() is recomended.
+#'
+#' @param os.tile.name A character string denoting thename of the desired OS tile with the form e.g. 'SU66nw' or 'SK36ne'. Beware this is case sensitive.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' <1m data has generally low coverage and at present is only available for DSM data.
+#' @param model.type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param merge.tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
+#' @param dest.folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
+#' @param ras.format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_tile <- function(resolution, os.tile.name, dest.folder, unzip.file, merge.tiles, save.tile, ras.format){
+get_tile <- function(os.tile.name, resolution, model.type, merge.tiles, dest.folder, ras.format){
+
+  TempRasDir <- tempdir()
+
+
+  if(!(model.type == 'DTM' || model.type == 'DSM')){
+    stop('Only DTM and DSM model types are supported at present.')
+  }
 
   if (missing(dest.folder)) {
     dest.folder <- tempdir()
-    message('No destination folder provided - saving to temp directory...')
-  }
-
-  if (missing(unzip.file)){
-    unzip.file <- TRUE
+    save.tile <- FALSE
+  } else {
+    save.tile <- TRUE
   }
 
   if (missing(merge.tiles)){
     merge.tiles <- TRUE
   }
 
-  if (merge.tiles == TRUE & unzip.file == FALSE){
-    warning('unzip.file arg set to false but mosaic.tiles set as TRUE. Setting unzip.file to TRUE by default')
-    unzip.file <- TRUE
-  }
-
-  if (missing(save.tile)){
-    save.tile <- FALSE
-  }
   if (missing(ras.format)){
     ras.format <- "GTiff"
   }
 
-  web.url <- compose_url(res=resolution, os.tile = os.tile.name)
-  dest.path <- compose_zip_path(save.folder = dest.folder, web.add = web.url)
-  download.file(url=web.url, destfile=dest.path, method='auto', quiet = FALSE)
-
-  if (unzip.file == TRUE){
-    exp.fold <- tools::file_path_sans_ext(dest.path)
-    zip::unzip(zipfile = dest.path, overwrite = TRUE, exdir = exp.fold)
-    unlink(dest.path, recursive = TRUE, force=TRUE)
-    dest.path <- exp.fold
+  rasformats <- raster::writeFormats()[,1]
+  if (!(ras.format %in% rasformats)){
+    stop('Requested Raster format not supported. Use raster::writeFormats() to view supported drivers')
   }
 
-  if (merge.tiles == TRUE){
-    ras.obj <- merge_ostiles(dest.path)
-    if (save.tile == TRUE){
-      raster::writeRaster(ras.obj, file.path(dest.folder, os.tile.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW"))
+  web.url <- compose_url(res=resolution, os.tile = os.tile.name, mod.type = model.type)
+  dest.path <- compose_zip_path(save.folder = TempRasDir, web.add = web.url)
 
+  tryCatch({
+  download.file(url=web.url, destfile=dest.path, method='auto', quiet = FALSE)
+  },
+  error=function(cond) {
+    message("\n Requested tile is not available!!! \n
+            Either: (1) No data is availale in this tile or \n
+            (2) try a different resolution... \n ")
+
+    return()
+  })
+
+
+  exp.fold <- tools::file_path_sans_ext(dest.path)
+  zip::unzip(zipfile = dest.path, overwrite = TRUE, exdir = exp.fold)
+  unlink(dest.path, recursive = TRUE, force=TRUE)
+  dest.path <- exp.fold
+
+
+  if (isTRUE(merge.tiles)){
+    ras.obj <- merge_ostiles(dest.path)
+    if (isTRUE(save.tile)){
+      ras.obj <- raster::writeRaster(ras.obj, file.path(dest.folder, os.tile.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW"))
+      unlink(dest.path, recursive = TRUE, force=TRUE)
     }
-    unlink(dest.path, recursive = TRUE, force=TRUE)
+
     return(ras.obj)
   }
 
   return(dest.path)
 }
+
+
+resave_rasters <- function(ras, folder, ras_format){
+  save_name <- tools::file_path_sans_ext(basename(ras@file@name))
+  out_ras <- raster::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW"))
+  return(out_ras)
+}
+
+#' Get DTM or DSM data for an Area
+#'
+#' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
+#' It retrieves all available data within the requested area defined by poly_area and offers some additional functionality to
+#' merge and crop the raster if desired. This function uses the get_tile function to extract all tiles that intersect the
+#' desired region.
+#'
+#' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' <1m data has generally low coverage and at present is only available for DSM data.
+#' @param model.type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param merge.tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
+#' @param crop Boolean with default FALSE. If TRUE data outside the bounds of the requested polygon area are discarded.
+#' @param dest.folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
+#' @param out.name Character required when saving merged raster to dest.folder.
+#' @param ras.format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @export
+get_area <- function(poly_area, resolution, model.type, merge.tiles, crop, dest.folder, out.name, ras.format){
+
+  if (isFALSE(merge.tiles) && !missing(dest.folder) && !missing(out.name)){
+    message('"out.name" ignored when saving multiple rasters i.e when "merge.type" = FALSE')
+  }
+
+  if (isTRUE(merge.tiles) && !missing(dest.folder) && missing(out.name)){
+
+    stop('When saving a merged raster (merged.tiles = TRUE) you must also provide a name (i.e out.name = "MyArea")')
+  }
+
+  if(!(model.type == 'DTM' || model.type == 'DSM')){
+    stop('Only "DTM" and "DSM" model types are supported at present.')
+  }
+
+  if (class(poly_area)[1] == "sf"){
+    sf_geom <- poly_area
+  } else {
+    sf_geom <- sf::read_sf(poly_area)
+  }
+
+  if (sf::st_crs(sf_geom)$epsg != 27700){
+    sf_geom <- sf_geom %>%
+      sf::st_transform(27700)
+  }
+
+
+  if (missing(dest.folder)) {
+    save.tile <- FALSE
+    dest.folder <- tempdir()
+    message('No destination folder provided - saving to temp directory...')
+  }else {
+    save.tile <- TRUE
+  }
+
+  if (missing(merge.tiles)){
+    merge.tiles <- TRUE
+  }
+
+  if (missing(crop)){
+    crop <- FALSE
+  }
+
+  if (isTRUE(crop) & isFALSE(merge.tiles)){
+    crop==FALSE
+    message(' "crop" arg. ignored - crop only applies when "merge.tiles" is TRUE')
+  }
+
+  if (missing(ras.format)){
+    ras.format <- "GTiff"
+  }
+
+  # tiles_5km <- readRDS('data/tile_within10km.rds')
+  tiles_5km <- tile_within10km
+
+  sf::st_agr(sf_geom) = "constant"
+  sf::st_agr(tiles_5km) = "constant"
+
+  tile_5km_inter <- tiles_5km %>%
+    sf::st_intersection(sf_geom)%>%
+    dplyr::pull(TILE_NAME) %>%
+    gsub("([0-9]\\D+)", "\\L\\1",.,perl=TRUE)
+
+
+  collect_tiles_safe <- function(x) {
+    f = purrr::possibly(function() get_tile(os.tile.name = x, resolution = resolution, model.type = model.type), otherwise = NA_real_)
+    f()
+  }
+
+
+  ras_list <- tile_5km_inter %>%
+    purrr::map( ~ collect_tiles_safe(.))
+
+  # remove any NA values produced  by missing tiles
+  ras_list <- ras_list[!is.na(ras_list)]
+
+  if (isTRUE(merge.tiles)){
+    if (length(ras_list) > 1){
+      ras.merge <- do.call(raster::merge, ras_list)
+    } else if(length(ras_list) == 1){
+
+      ras.merge <- ras_list[[1]]
+
+    }
+
+    if (isTRUE(crop)){
+      ras.merge <- raster::crop(ras.merge, sf_geom)
+    }
+
+    if (isTRUE(save.tile)){
+      ras.merge <- raster::writeRaster(ras.merge, file.path(dest.folder, out.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW"))
+    }
+    return(ras.merge)
+  } else {
+    if (isTRUE(save.tile)){
+
+      ras_list <- ras_list %>%
+        purrr::map(~ resave_rasters(ras=., folder = dest.folder, ras_format = ras.format))
+
+      return(ras_list)
+    }
+    return(ras_list)
+  }
+
+
+
+
+  return(ras_list)
+}
+
