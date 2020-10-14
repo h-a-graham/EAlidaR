@@ -13,7 +13,7 @@ The purpose of this package is to provide a clean and easy way to download and i
 
 ### Installation
 
-`devtools::install_github`
+`devtools::install_github('h-a-graham/EAlidaR')`
 
 
 ### Introduction
