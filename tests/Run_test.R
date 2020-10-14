@@ -1,6 +1,6 @@
 
-# library(ggplot2)
-# library(ggspatial)
+library(ggplot2)
+library(ggspatial)
 
 devtools::document()
 # devtools::uninstall()
@@ -58,8 +58,7 @@ gecko.e <- 'C:/Installation_Files/gecko/geckodriver-v0.27.0-win64/geckodriver.ex
 #   dplyr::select(TILE_NAME, geom) %>%
 #   saveRDS(., 'data/tile_within10km.rds')
 
-library(ggplot2)
-library(ggspatial)
+
 
 devtools::load_all()
 save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST'
@@ -94,7 +93,7 @@ devtools::load_all()
 save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
 poly_sf <- sf::read_sf('tests/Test_Area2.gpkg')
 
-rasAreaTest <- get_area(poly_area = poly_sf, resolution = 2, model.type = 'DTM', merge.tiles=FALSE, crop=FALSE, dest.folder = save_folder, out.name = 'TestArea') #, dest.folder, out.name, ras.format
+rasAreaTest <- get_area(poly_area = poly_sf, resolution = 2, model.type = 'DTM', merge.tiles=TRUE, crop=TRUE, dest.folder = save_folder, out.name = 'TESTAREA')
 
 
 

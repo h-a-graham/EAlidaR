@@ -58,7 +58,7 @@ join_paths <- function(p1, p2){
 }
 
 
-#' @export
+
 merge_ostiles <- function(ras.folder){
   ras.list <- list.files(ras.folder)
   ras.list <- purrr::discard(ras.list , grepl(".tif.xml|.tfw|index", ras.list ))
@@ -118,12 +118,10 @@ get_tile <- function(os.tile.name, resolution, model.type, dest.folder, merge.ti
   download.file(url=web.url, destfile=dest.path, method='auto', quiet = FALSE)
   },
   error=function(cond) {
-    message("Requested tile is not available!!! \n
+    message("\n Requested tile is not available!!! \n
             Either: (1) No data is availale in this tile or \n
             (2) try a different resolution... \n ")
-    # message("Original error message:")
-    # message(cond)
-    # Choose a return value in case of error
+
     return()
   })
 
@@ -134,9 +132,9 @@ get_tile <- function(os.tile.name, resolution, model.type, dest.folder, merge.ti
   dest.path <- exp.fold
 
 
-  if (merge.tiles == TRUE){
+  if (isTRUE(merge.tiles)){
     ras.obj <- merge_ostiles(dest.path)
-    if (save.tile == TRUE){
+    if (isTRUE(save.tile)){
       ras.obj <- raster::writeRaster(ras.obj, file.path(dest.folder, os.tile.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW"))
       unlink(dest.path, recursive = TRUE, force=TRUE)
     }
@@ -149,9 +147,7 @@ get_tile <- function(os.tile.name, resolution, model.type, dest.folder, merge.ti
 
 
 resave_rasters <- function(ras, folder, ras_format){
-  print('B')
-  save_name <- tools::file_path_sans_ext(basename(ras[[2]]@file@name))
-  print(save_name)
+  save_name <- tools::file_path_sans_ext(basename(ras@file@name))
   out_ras <- raster::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW"))
   return(out_ras)
 }
@@ -160,8 +156,13 @@ resave_rasters <- function(ras, folder, ras_format){
 #' @export
 get_area <- function(poly_area, resolution, model.type, merge.tiles, crop, dest.folder, out.name, ras.format){
 
-  if (merge.tiles == TRUE & !missing(dest.folder) & missing(out.name)){
-    stop('When saving a merged raster (merged.tiles = TRUE) you must also provide a name (i.e out.name = "MyArea)"')
+  if (isFALSE(merge.tiles) && !missing(dest.folder) && !missing(out.name)){
+    message('"out.name" ignored when saving multiple rasters i.e when "merge.type" = FALSE')
+  }
+
+  if (isTRUE(merge.tiles) && !missing(dest.folder) && missing(out.name)){
+
+    stop('When saving a merged raster (merged.tiles = TRUE) you must also provide a name (i.e out.name = "MyArea")')
   }
 
   if(!(model.type == 'DTM' || model.type == 'DSM')){
@@ -196,7 +197,7 @@ get_area <- function(poly_area, resolution, model.type, merge.tiles, crop, dest.
     crop <- FALSE
   }
 
-  if (crop == TRUE & merge.tiles == FALSE){
+  if (isTRUE(crop) & isFALSE(merge.tiles)){
     crop==FALSE
     message(' "crop" arg. ignored - crop only applies when "merge.tiles" is TRUE')
   }
@@ -228,7 +229,7 @@ get_area <- function(poly_area, resolution, model.type, merge.tiles, crop, dest.
   # remove any NA values produced  by missing tiles
   ras_list <- ras_list[!is.na(ras_list)]
 
-  if (merge.tiles ==TRUE){
+  if (isTRUE(merge.tiles)){
     if (length(ras_list) > 1){
       ras.merge <- do.call(raster::merge, ras_list)
     } else if(length(ras_list) == 1){
@@ -237,20 +238,20 @@ get_area <- function(poly_area, resolution, model.type, merge.tiles, crop, dest.
 
     }
 
-    if (crop==TRUE){
+    if (isTRUE(crop)){
       ras.merge <- raster::crop(ras.merge, sf_geom)
     }
 
-    if (save.tile == TRUE){
+    if (isTRUE(save.tile)){
       ras.merge <- raster::writeRaster(ras.merge, file.path(dest.folder, out.name), format=ras.format, overwrite=TRUE, options = c("COMPRESS=LZW"))
     }
     return(ras.merge)
   } else {
-    if (save.tile == TRUE){
-      print('B1')
+    if (isTRUE(save.tile)){
+
       ras_list <- ras_list %>%
         purrr::map(~ resave_rasters(ras=., folder = dest.folder, ras_format = ras.format))
-      print('B2')
+
       return(ras_list)
     }
     return(ras_list)
