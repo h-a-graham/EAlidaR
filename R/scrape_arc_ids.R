@@ -6,7 +6,20 @@ string_match <- function(string){
   as.integer(stringr::str_match(string, 'Tile_\\s*(.*?)\\s*.zip')[,2])
 }
 
-
+#' Scrape Arc Web Map object IDs for 10km OS tiles using python Selenium WebDriver
+#'
+#' This function should not be required by the user. It is here for completeness given the development state of this package.
+#' It uses the reticulate package to run Python's selenium webdriver module and upload the zipped shape files produced in create_zip_tiles.
+#' Python and resticulate are not required to run the downlaod functions of this package. required python packages are: Selenium, pyautgui and pandas.
+#' everything seems to work well when istalled from the conda forge channel. Whilst I have limited this execution to conda only it could be adapted to
+#' other python set ups but why would you not just use conda ;)
+#'
+#' @param conda_path A character string for the filepath to the appropriate Conda environment.
+#' @param env_name character - the name of that conda environment.
+#' @param gecko_exe file path to the gecko executable - download from here: https://github.com/mozilla/geckodriver/releases
+#' @param previous This function never works first time for many reasons so this allows for the inclusion of outputs from previous attempts so
+#' they don't need to be re run.
+#' @return A named list containing two data frames $error_log and $arc_ids.
 #' @export
 scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
   options(warn=1)
@@ -30,7 +43,9 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
   }
 
   #create glob here:
-  tile_glob <- Sys.glob(file.path('data/grid_shp_zip/Tile_*.zip'))%>%
+  glob_fold <- system.file('data', 'grid_shp_zip', package = "EAlidaR")
+
+  tile_glob <- Sys.glob(file.path(glob_fold, 'Tile_*.zip'))%>%
     purrr::map(., normalizePath)
 
   if (!is.null(previous) == TRUE){
@@ -58,7 +73,8 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
   reticulate::use_condaenv(condaenv =conda_path, env_name, required = TRUE) # add glob as arg...
 
   # Source python functions...
-  reticulate::source_python("python/EA_scrape_functions.py")
+  pyscript <- system.file('python', 'EA_scrape_functions.py', package = "EAlidaR")
+  reticulate::source_python(pyscript)
   py_out <- scrapestuff(gecko_exe, tile_glob)
 
   if (!is.null(previous) == TRUE){
@@ -75,11 +91,18 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
 }
 
 
-
+#' Check the coverage of Arc Web IDs retrieved from scrape_tile_IDs()
+#'
+#' This function should not be required by the user. It plots the coverage of tiles IDs retrieved.
+#'
+#' @param .scrape_out The object produced from scrape_tile_IDs()
+#' @return A named list containing $tile_plot - a ggplot object and $missing_tile_df a data frame of missing tiles.
 #' @export
 check_tiles <- function(.scrape_out){
 
-  grid_sf <- sf::read_sf('data/10km_Grid_LiDAR_inter.gpkg') %>%
+  gridpath <- system.file('data', '10km_Grid_LiDAR_inter.gpkg', package = "EAlidaR")
+
+  grid_sf <- sf::read_sf(gridpath) %>%
     # tibble::rownames_to_column(var = "grid_id") %>%
     dplyr::mutate(grid_id = as.numeric(grid_id))%>%
     dplyr::left_join(., .scrape_out$arc_ids, by = c("grid_id"= "tile_n")) %>%
@@ -115,6 +138,11 @@ check_tiles <- function(.scrape_out){
 
 
 
+#' Save the output of scrape_tile_IDs()
+#'
+#' This function should not be required by the user. It saves the scrape_tile_IDs() in case you need to pick it up again later...
+#'
+#' @param scrape.obj The object produced from scrape_tile_IDs()
 #' @export
 save_arc_IDs <- function(scrape.obj){
 # option to save scrape objectect (including error log - allowing for repeat runs)
@@ -123,7 +151,15 @@ saveRDS(scrape.obj, file = save_path)
 # return(readRDS(save_path))
 }
 
-
+#' Save the output of scrape_tile_IDs()
+#'
+#' This function should not be required by the user. When all tile IDs have been retrieved the results are saved as an sf object.
+#' This object will then be used in download function to carry out spatial joins. Also provides a plot denoting the coverage that is
+#' available.
+#'
+#' @param scrape.obj The object produced from scrape_tile_IDs()
+#' @return named list containing $coverplot a ggplot object and $cover_sf the sf object with joined arc ID values.
+#' @export
 scrape_to_sf <- function(scrape.obj){
 
 
@@ -144,7 +180,8 @@ scrape_to_sf <- function(scrape.obj){
 
     ggplot2::labs(subtitle = stringr::str_c('10km Tile Coverage'))
 
-  save_path <- file.path('data/coverage_10km_sf.rds')
+  save_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
+
   saveRDS(grid_sf, file = save_path)
 
   return(list(cover_plot = coverage_plot, cover_sf = readRDS(save_path)))

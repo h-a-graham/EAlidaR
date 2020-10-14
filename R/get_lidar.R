@@ -3,9 +3,11 @@
 get_arc_id <- function(tile.string){
   req_tile <- stringr::str_to_upper(tile.string)
 
-  tiles_10km <- readRDS('data/coverage_10km_sf.rds')
+  t10km_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
+  tiles_10km <- readRDS(t10km_path)
 
-  tiles_5km <- readRDS('data/tile_within10km.rds')
+  t5km_path <- system.file('data', 'tile_within10km.rds', package = "EAlidaR")
+  tiles_5km <- readRDS(t5km_path)
 
   sf::st_agr(tiles_10km) = "constant"
   sf::st_agr(tiles_5km) = "constant"
@@ -80,9 +82,22 @@ merge_ostiles <- function(ras.folder){
   return(ras.merge)
 }
 
-
+#' Get DTM or DSM Data for a 5km Ordnance Survey (OS) Tile
+#'
+#' This function downloads Raster data from the DEFRA portal https://environment.data.gov.uk/DefraDataDownload/?Mode=survey.
+#' It retrieves all available data within the requested OS tile defined by os.tile.name. This function only works across one tile;
+#' if additional rasters are desired get_area() is recomended.
+#'
+#' @param os.tile.name A character string denoting thename of the desired OS tile with the form e.g. 'SU66nw' or 'SK36ne'. Beware this is case sensitive.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' <1m data has generally low coverage and at present is only available for DSM data.
+#' @param model.type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param merge.tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
+#' @param dest.folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
+#' @param ras.format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_tile <- function(os.tile.name, resolution, model.type, dest.folder, merge.tiles, ras.format){
+get_tile <- function(os.tile.name, resolution, model.type, merge.tiles, dest.folder, ras.format){
 
   TempRasDir <- tempdir()
 
@@ -152,7 +167,23 @@ resave_rasters <- function(ras, folder, ras_format){
   return(out_ras)
 }
 
-
+#' Get DTM or DSM data for an Area
+#'
+#' This function downloads Raster data from the DEFRA portal https://environment.data.gov.uk/DefraDataDownload/?Mode=survey.
+#' It retrieves all available data within the requested area defined by poly_area and offers some additional functionality to
+#' merge and crop the raster if desired. This function uses the get_tile function to extract all tiles that intersect the
+#' desired region.
+#'
+#' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' <1m data has generally low coverage and at present is only available for DSM data.
+#' @param model.type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param merge.tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
+#' @param crop Boolean with default FALSE. If TRUE data outside the bounds of the requested polygon area are discarded.
+#' @param dest.folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
+#' @param out.name Character required when saving merged raster to dest.folder.
+#' @param ras.format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_area <- function(poly_area, resolution, model.type, merge.tiles, crop, dest.folder, out.name, ras.format){
 

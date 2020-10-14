@@ -95,26 +95,20 @@ poly_sf <- sf::read_sf('tests/Test_Area2.gpkg')
 
 rasAreaTest <- get_area(poly_area = poly_sf, resolution = 2, model.type = 'DTM', merge.tiles=TRUE, crop=TRUE, dest.folder = save_folder, out.name = 'TESTAREA')
 
-
-
 ggplot() +
   # loads background map tiles from a tile source - rosm::osm.types() for osm options
   annotation_map_tile(type = "hillshade", zoomin = -1) +
-
+  # requested area
   annotation_spatial(poly_sf, size = 2, col = "black") +
-  # raster layers train scales and get projected automatically
+  # raster layer
   layer_spatial(rasAreaTest, alpha = 0.8) +
   # make no data values transparent
   scale_fill_viridis_c(na.value = NA) +
+  # get real coords
+  coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
 
-  # spatial-aware automagic scale bar
-  annotation_scale(location = "tl") +
-
-  # spatial-aware automagic north arrow
-  annotation_north_arrow(location = "br", which_north = "true") +
   guides(fill=FALSE)+
-  theme_bw() +
-  labs(fill='Elevation (m)')
+  theme_bw()
 
 
 
