@@ -1,4 +1,4 @@
-
+# library(EAlidaR)
 library(ggplot2)
 library(ggspatial)
 
@@ -33,25 +33,23 @@ ggplot() +
 
 devtools::load_all()
 save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
-# poly_sf <- sf::read_sf('tests/Test_Area2.gpkg')
 
 rasAreaTest <- get_area(poly_area = DerwentHeadwater, resolution = 2, model.type = 'DTM', merge.tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
 
 ggplot() +
   # loads background map tiles from a tile source - rosm::osm.types() for osm options
-  annotation_map_tile(type = "osm", zoomin = -1) +
+  annotation_map_tile(type = "hillshade", zoomin = -1) +
   # requested area
-  annotation_spatial(poly_sf, size = 2, col = "black") +
+  annotation_spatial(DerwentHeadwater, size = 2, col = "black") +
   # raster layer
-  layer_spatial(rasAreaTest, alpha = 0.8) +
+  layer_spatial(rasAreaTest, alpha = 0.6) +
   # make no data values transparent
-  scale_fill_viridis_c(na.value = NA) +
+  scale_fill_distiller(na.value = NA, name='Elevation (m)') +
   # get real coords
   coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
-  guides(fill=FALSE)+
   theme_bw()
 
-
+ggsave(filename = 'man/figures/README_example.png', dpi = 600)
 
 devtools::install_github("tylermorganwall/rayshader")
 
