@@ -4,7 +4,10 @@
 \alias{create_zip_tiles}
 \title{Generate Zipped ESRI shapefiles (.shp) for all 10km OS grids that intersect any lidar data}
 \usage{
-create_zip_tiles()
+create_zip_tiles(out.path)
+}
+\arguments{
+\item{out.path}{The export folder which will contain a new folder named 'grid_shp_zip' in which the zipped .shp files will be created.}
 }
 \value{
 A list the zipped paths.

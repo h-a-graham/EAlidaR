@@ -4,7 +4,7 @@
 \alias{scrape_tile_IDs}
 \title{Scrape Arc Web Map object IDs for 10km OS tiles using python Selenium WebDriver}
 \usage{
-scrape_tile_IDs(conda_path, env_name, gecko_exe, previous)
+scrape_tile_IDs(conda_path, env_name, gecko_exe, zip_shp_folder, previous)
 }
 \arguments{
 \item{conda_path}{A character string for the filepath to the appropriate Conda environment.}
@@ -12,6 +12,8 @@ scrape_tile_IDs(conda_path, env_name, gecko_exe, previous)
 \item{env_name}{character - the name of that conda environment.}
 
 \item{gecko_exe}{file path to the gecko executable - download from here: \url{https://github.com/mozilla/geckodriver/releases}}
+
+\item{zip_shp_folder}{the path to the folder containing all of the zipped tiles produced in create_zip_tiles()}
 
 \item{previous}{This function never works first time for many reasons so this allows for the inclusion of outputs from previous attempts so
 they don't need to be re run.}

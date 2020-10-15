@@ -25,17 +25,15 @@ zip_shp <- function(.val, .path, .sfObj){
 #'
 #' This function should not be required by the user. It generates the numerous >1500 zipped shp files that need to be uploaded
 #' to the DEFRA portal in order to scrape the Arc Web IDs in scrape_tile_IDs().
-#'
+#' @param out.path The export folder which will contain a new folder named 'grid_shp_zip' in which the zipped .shp files will be created.
 #' @return A list the zipped paths.
 #' @export
-create_zip_tiles <- function(){
+create_zip_tiles <- function(out.path){
   datadirec <- system.file('data', package = "EAlidaR")
-  direc <- file.path(datadirec, 'grid_shp_zip')
+  direc <- file.path(out.path, 'grid_shp_zip')
   dir.create(direc, showWarnings = FALSE)
 
-  grid_10km.path <- system.file('data', '10km_Grid_LiDAR_inter.gpkg', package = "EAlidaR")
-
-  grid_10km <- sf::read_sf(grid_10km.path) %>%
+  grid_10km <- km10_Grid_LiDAR_inter %>%
     dplyr::select(grid_id, geom)
 
   sf::st_geometry(grid_10km)%>%
