@@ -4,7 +4,6 @@
 #' diamonds.
 #'
 #' @format An sf object with asingle feature
-#'   ...
-#' }
+#'
 #' @source created in QGIS/R - it's nothing special!
 "DerwentHeadwater"

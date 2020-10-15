@@ -5,7 +5,7 @@
 \alias{DerwentHeadwater}
 \title{An sf object in the area of the upper reaches of the Derwent Catchment}
 \format{
-
+An sf object with asingle feature
 }
 \source{
 created in QGIS/R - it's nothing special!

@@ -1,10 +1,9 @@
-# library(EAlidaR)
+# devtools::document()
+# devtools::load_all()
+
+library(EAlidaR)
 library(ggplot2)
 library(ggspatial)
-
-devtools::document()
-
-devtools::load_all()
 
 save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST'
 

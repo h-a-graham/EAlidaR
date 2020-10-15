@@ -19,9 +19,10 @@ string_match <- function(string){
 #' @param gecko_exe file path to the gecko executable - download from here: \url{https://github.com/mozilla/geckodriver/releases}
 #' @param previous This function never works first time for many reasons so this allows for the inclusion of outputs from previous attempts so
 #' they don't need to be re run.
+#' @param zip_shp_folder the path to the folder containing all of the zipped tiles produced in create_zip_tiles()
 #' @return A named list containing two data frames $error_log and $arc_ids.
 #' @export
-scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
+scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, zip_shp_folder, previous){
   options(warn=1)
 
   #  Warning section to make sure the user doesn't run function unless required...
@@ -43,9 +44,7 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, previous){
   }
 
   #create glob here:
-  glob_fold <- system.file('data', 'grid_shp_zip', package = "EAlidaR")
-
-  tile_glob <- Sys.glob(file.path(glob_fold, 'Tile_*.zip'))%>%
+  tile_glob <- Sys.glob(file.path(zip_shp_folder, 'Tile_*.zip'))%>%
     purrr::map(., normalizePath)
 
   if (!is.null(previous) == TRUE){

@@ -1,14 +1,14 @@
 # EAlidaR
-Package to download EA liDAR data
+An R package to download EA LiDAR composite data for England.
 
 
-So this package is very much in development...
+This package is very much in development... I would really welcome any comments, suggestions, issues etc. If anything strange crops up please submit and issue here: https://github.com/h-a-graham/EAlidaR/issues 
 
 ### Background:
 
-The Environment Agency provide high resolution, open source elevation datasets for much of England. At present the best (only?) way to download this data is via the ESRI-based web map portal (https://environment.data.gov.uk/DefraDataDownload/?Mode=survey). This has numerous drawbacks - there are limits to the number of files that can be extracted at any given time, the spatial join between the requested area and available tiles is very slow and the data is provided in zipped files of varying raster formats (mainly ASCII and GeoTiff). 
+The Environment Agency (EA) provide high resolution, open source elevation datasets for much of England. At present, the best (only?) way to download this data is via the ESRI-based web map portal (https://environment.data.gov.uk/DefraDataDownload/?Mode=survey). This has numerous drawbacks - there are limits to the number of files that can be extracted at any given time, the spatial join between the requested area and available tiles is very slow and the data is provided in zipped files of varying raster formats (mainly ASCII and GeoTiff). 
 
-The purpose of this package is to provide a clean and easy way to download and interact directly with these excellent data in R. For completeness, given the development state of this package there are two main sections if you like:  (1) A front end which provides the main function needed to download the data namely 'EAlidaR::get_area' and 'EAlidaR::get_tile' - more on these below. (2) Then there is the behind the scenes section which provides the fundamentals of building the database required to access the data. Here the main function of concern is 'EAlidaR::scrape_tile_IDs' which uses Reticulate to utilise python's selenium web driver library. This allows for the automated upload of xipped 10km grid .shp files to the portal and then scrape the Arc Web Map object IDs from the download URL (no actual data is downloaded in this step). To be honest, I have no idea if these codes will last forever so I'll leave the functions here in case they need to be re-run or if new data becomes available etc.
+The purpose of this package is to provide a clean and easy way to download and interact directly with these excellent data in R. For completeness, given the development state of this package, there are two main sections if you like:  (1) A front end which provides the main function needed to download the data; namely 'EAlidaR::get_area' and 'EAlidaR::get_tile' - more on these below. (2) Then there is the behind the scenes section which provides the fundamentals of building the database required to access the data. Here the main function of concern is 'EAlidaR::scrape_tile_IDs' which uses Reticulate to utilise python's selenium web driver library. This allows for the automated upload of zipped 10km grid .shp files to the portal and then scrapes the Arc Web Map object IDs from the download URL (no actual data is downloaded in this step). To be honest, I have no idea if these object ID codes will last forever so I'll leave the functions here in case they need to be re-run or if new data becomes available etc.
 
 
 ### Installation
@@ -16,9 +16,9 @@ The purpose of this package is to provide a clean and easy way to download and i
 `devtools::install_github('h-a-graham/EAlidaR')`
 
 
-### Introduction
+### Examples:
 
-Here is a simple use case where we download the available 2m DTM data for the example region provided with the package `DerwentHeadwater`. using the `get_area` function we retrieve a single raster as 'merge.tiles' is TRUE. We can save this data in a desired location with 'dest.folder' and 'out.name' arguments but in this case rasters are stored in the `tempfile()` location and will be available only during the active R session (unless subsequently saved with `raster::writeRaster`).
+Here is a simple use case where we download the available 2m DTM data for the example region provided with the package `DerwentHeadwater`. using the `get_area` function we retrieve a single raster as 'merge.tiles' is TRUE. We can save this data in a desired location with 'dest.folder', 'out.name' and 'ras.format' arguments but, in this case, rasters are stored in the `tempfile()` location and will be available only during the active R session (unless subsequently saved with `raster::writeRaster`).
 We then plot the data using the excellent ggplot and ggspatial packages see here for more cool ideas for plotting spatial data in R here: https://github.com/paleolimbot/ggspatial 
 
 ```
@@ -43,3 +43,10 @@ ggplot() +
 ```
 ![Derwent Headwater Example](/man/figures/README_example.png)
 
+
+Alternatively, the function `get_tile` offers the ability to download the data from a single 5km OS tile. Make sure the case is correct in 'os.tile.name' with the first two characters in caps and last two in lower case. 'dest.folder' can be supplied to save the raster(s) in a specified location, otherwise it will be written to tempfile(). 'ras.format' is another optional argument that can be used to specify the raster driver used see `raster::writeFormats()` for options - default is GeoTiff.
+
+```
+rasTile <- get_tile(resolution = 2, model.type = 'DTM' , os.tile.name = 'SU66nw')
+
+```
