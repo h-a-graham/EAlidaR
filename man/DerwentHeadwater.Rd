@@ -14,7 +14,6 @@ created in QGIS/R - it's nothing special!
 DerwentHeadwater
 }
 \description{
-A dataset containing the prices and other attributes of almost 54,000
-diamonds.
+Like it says in the tile - an sf oject to use as a test example for the EAlidaR package
 }
 \keyword{datasets}
