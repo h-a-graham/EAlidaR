@@ -23,6 +23,7 @@ Imports:
   forcats,
   ggplot2,
   purrr,
-  stringr
+  stringr,
+  progress
 Depends: 
     R (>= 2.10)
