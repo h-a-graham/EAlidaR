@@ -138,6 +138,7 @@ get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_fol
     download.file(url=web_url, destfile=dest_path, method='auto', quiet = TRUE)
   },
   error=function(cond) {
+    message("\n")
     message(paste('WARNING: No data is available for tile', os_tile_name ,'with a resolution of', resolution , 'm', sep = " "))  #
     return()
   })
