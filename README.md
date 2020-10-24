@@ -93,7 +93,7 @@ render_depth(focus = 0.7, focallength = 70, clear = TRUE)
 ![Exeter Uni Example](/man/figures/UoeRayshade.png)
 
 
-And finally if you really want to melt your computer ;) why not build a 3d model of Exeter City with the `Exeter_sf` dataset:
+If you really want to melt your computer ;) why not build a 3d model of Exeter City with the `Exeter_sf` dataset:
 
 ```
 ExeterRas <- get_area(poly_area = Exeter_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
@@ -108,6 +108,27 @@ ExeterMat %>%
           solid = FALSE)
 
 Sys.sleep(0.2)
-render_snapshot()
+render_snapshot(clear = TRUE)
 ```
 ![Exeter City Example](/man/figures/ExeterRayshade.png)
+
+And finally...In some parts of England you can download <1m resolution data - here is an example using the `city_of_london_sf`
+
+```
+CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 0.5, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
+
+
+CoL_Mat = raster_to_matrix(CoL_Ras)
+
+CoL_Mat %>%
+  sphere_shade(texture = "bw") %>%
+  add_shadow(ray_shade(CoL_Mat, zscale = 1, multicore =TRUE), 0.3) %>%
+  add_shadow(ambient_shade(CoL_Mat, multicore=TRUE), 0.1) %>%
+  plot_3d(CoL_Mat, zscale = 1, fov = 60, theta = 20, phi = 30, windowsize = c(1000, 800), zoom = 0.3,
+          solid = FALSE)
+
+Sys.sleep(0.2)
+render_depth(focus = 0.7, focallength = 70, clear = TRUE)
+
+```
+![City of London Example](/man/figures/CoLRayshade.png)
