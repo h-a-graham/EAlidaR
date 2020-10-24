@@ -1,5 +1,5 @@
 # EAlidaR
-<img src="/man/figures/CoLRayshade.png" width="40%">
+<img src="/man/figures/CoLRayshade.png" width="70%">
 
 An R package to download EA LiDAR composite data for England.
 
