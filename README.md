@@ -1,4 +1,6 @@
 # EAlidaR
+<img src="/man/figures/CoLRayshade.png" width="40%">
+
 An R package to download EA LiDAR composite data for England.
 
 
@@ -20,7 +22,7 @@ The purpose of this package is to provide a clean and easy way to download and i
 ### Examples:
 
 Here is a simple use case where we download the available 2m DTM data for one of the example regions provided with the package `Ashop_sf`. using the `get_area` function we retrieve a single raster as 'merge_tiles' is TRUE. We can save this data in a desired location with 'dest_folder', 'out_name' and 'ras_format' arguments but, in this case, rasters are stored in the `tempfile()` location and will be available only during the active R session (unless subsequently saved with `raster::writeRaster`).
-We then plot the data using the excellent ggplot and ggspatial packages see here for more cool ideas for plotting spatial data in R here: https://github.com/paleolimbot/ggspatial 
+We then plot the data using the excellent ggspatial package (https://github.com/paleolimbot/ggspatial)
 
 ```
 library(EAlidaR)
@@ -45,14 +47,14 @@ ggplot() +
 ![Ashop Map Example](/man/figures/AshopMap.png)
 
 
-Alternatively, the function `get_tile` offers the ability to download the data from a single 5km OS tile. Make sure the case is correct in 'os_tile_name' with the first two characters in caps and last two in lower case. 'dest_folder' can be supplied to save the raster(s) in a specified location, otherwise it will be written to tempfile(). 'ras_format' is another optional argument that can be used to specify the raster driver used see `raster::writeFormats()` for options - default is GeoTiff.
+Alternatively, the function `get_tile` downloads data from a single 5km OS tile. Make sure the case is correct in 'os_tile_name' with the first two characters in caps and last two in lower case. 'dest_folder' can be supplied to save the raster(s) in a specified location, otherwise it will be written to tempfile(). 'ras_format'  can be used to specify the raster driver used see `raster::writeFormats()` for options - default is GeoTiff.
 
 ```
 rasTile <- get_tile(os_tile_name = 'SU66nw', resolution = 2, model_type = 'DTM')
 
 ```
 
-And just to really show off how great this data is, here are some examples with the brilliant rayshader package (more info at: https://github.com/tylermorganwall/rayshader). First let's try out the Ashop Valley data we downloaded earlier. Note that multicore is set to TRUE, in these examples, as this as they are fairly datasets - set to FALSE if you don't want to use multiprocessing.
+And just to really show off how great this data is, here are some 3D examples with the brilliant rayshader package (more info at: https://github.com/tylermorganwall/rayshader). First let's try out the Ashop Valley data we downloaded previously. Note that multicore is set to TRUE, in these examples, as they are quite large rasters - set to FALSE if you don't want to use multiprocessing.
 
 ```
 library(rayshader)
@@ -71,7 +73,7 @@ render_depth(focus = 0.7, focallength = 70, clear = TRUE)
 ```
 ![Ashop Rayshader Example](/man/figures/AshopRayshade.png)
 
-Now for a smaller example The below uses the built in `UniOfExeter_sf` polygon to download 1m DSM data for the Streatham campus region and then visualise with rayshader...
+Now for a smaller example; the code below uses the built in `UniOfExeter_sf` polygon to download 1m DSM data for the Streatham campus region and then visualise with rayshader...
 
 ```
 ExeUniRas <- get_area(poly_area = UniOfExeter_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
@@ -91,7 +93,7 @@ render_depth(focus = 0.7, focallength = 70, clear = TRUE)
 ![Exeter Uni Example](/man/figures/UoeRayshade.png)
 
 
-And finally if you really want to melt your computer why not build a 3d model of Exeter City with the `Exeter_sf` dataset:
+And finally if you really want to melt your computer ;) why not build a 3d model of Exeter City with the `Exeter_sf` dataset:
 
 ```
 ExeterRas <- get_area(poly_area = Exeter_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)

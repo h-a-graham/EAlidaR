@@ -28,7 +28,7 @@ compose_url <- function(res, os.tile, mod.type){
 
   if (res == 1 || res == 2){
     res.str <- sprintf('%sM',res)
-  } else if (res == 0.25 || res == res_cm){
+  } else if (res == 0.25 || res == 0.5){
     res_cm <- res * 100
     res.str <- sprintf('%sCM',res_cm)
   } else {
@@ -38,7 +38,11 @@ compose_url <- function(res, os.tile, mod.type){
   arc_web_id <- get_arc_id(os.tile)
 
   if (mod.type == 'DTM'){
-    download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2019-%s.zip', arc_web_id, res.str, os.tile)
+    if (res == 1 || res == 2){
+      download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2019-%s.zip', arc_web_id, res.str, os.tile)
+    } else if (res == 0.25 || res == 0.5){
+      download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-%s.zip', arc_web_id, res.str, os.tile)
+    }
   } else if (mod.type == 'DSM') {
     download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DSM-%s-%s.zip', arc_web_id, res.str, os.tile)
   }
@@ -275,6 +279,10 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
   # remove any NA values produced  by missing tiles
   ras_list <- ras_list[!is.na(ras_list)]
 
+  if (length(ras_list) == 0 ){
+    stop(sprintf('\nNo data is available for the requested area at a resolution of %s m \n
+consider trying a coarser resolution or check the available coverage.', resolution))
+  }
 
 
   if (isTRUE(merge_tiles)){

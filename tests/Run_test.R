@@ -15,7 +15,7 @@ library(rayshader)
 
 # area_withfail <- read_sf('tests/Test_Area3.gpkg')
 
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 0.25, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
 
 
 
@@ -93,3 +93,27 @@ Sys.sleep(0.2)
 render_snapshot(filename = 'man/figures/ExeterRayshade.png')
 
 
+# --------------- Grimwith York Dales Rayshade ----------------------------
+
+CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 0.5, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
+
+# ggplot() +
+#
+#   annotation_map_tile(type = "osm", zoomin = -1) +
+#   annotation_spatial(city_of_london_sf, size = 2, col = "black", fill = NA) +
+#   layer_spatial(CoL_Ras, alpha = 0.8) +
+#   scale_fill_distiller(na.value = NA, name='Elevation (m)') +
+#   coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
+#   theme_bw()
+
+CoL_Mat = raster_to_matrix(CoL_Ras)
+
+CoL_Mat %>%
+  sphere_shade(texture = "bw") %>%
+  add_shadow(ray_shade(CoL_Mat, zscale = 1, multicore =TRUE), 0.3) %>%
+  add_shadow(ambient_shade(CoL_Mat, multicore=TRUE), 0.1) %>%
+  plot_3d(CoL_Mat, zscale = 1, fov = 60, theta = 20, phi = 30, windowsize = c(1000, 800), zoom = 0.3,
+          solid = FALSE)
+
+Sys.sleep(0.2)
+render_depth(focus = 0.7, focallength = 70, clear = FALSE, filename = 'man/figures/CoLRayshade.png')
