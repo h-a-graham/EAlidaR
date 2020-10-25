@@ -9,7 +9,10 @@ library(rayshader)
 
 # -------------- check cover example --------------
 
-check_coverage(poly_area = Ashop_sf, resolution = 1)
+check_coverage(poly_area = Ashop_sf, resolution = 2)
+ggsave(filename = 'man/figures/AshopCover.png', dpi = 600)
+
+
 national_coverage(resolution = 0.25)
 
 # ---------- Ashop download and map example ------------------
