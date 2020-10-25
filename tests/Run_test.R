@@ -7,6 +7,10 @@ library(ggspatial)
 library(sf)
 library(rayshader)
 
+# -------------- check cover example --------------
+
+check_coverage(poly_area = Ashop_sf, resolution = 1)
+national_coverage(resolution = 0.25)
 
 # ---------- Ashop download and map example ------------------
 # save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
@@ -15,7 +19,7 @@ library(rayshader)
 
 area_withfail <- read_sf('tests/Test_Area3.gpkg')
 
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 1, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
 
 
 

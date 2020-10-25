@@ -94,7 +94,7 @@ merge_ostiles <- function(ras.folder){
 #' if additional rasters are desired get_area() is recomended.
 #'
 #' @param os_tile_name A character string denoting thename of the desired OS tile with the form e.g. 'SU66nw' or 'SK36ne'. Beware this is case sensitive.
-#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 #' <1m data has generally low coverage and at present is only available for DSM data.
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
@@ -179,7 +179,7 @@ resave_rasters <- function(ras, folder, ras_format){
 
 missing_tiles_warn <- function(mod_type, res, tile_str){
   message(sprintf('WARNING: Coverage incomplete! No %s data was available at a %s m resolution for the following tiles: \
-%s',mod_type, res, tile_str))
+         %s',mod_type, res, tile_str))
 }
 
 #' Get DTM or DSM data for an Area
@@ -190,7 +190,7 @@ missing_tiles_warn <- function(mod_type, res, tile_str){
 #' desired region.
 #'
 #' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
-#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 #' <1m data has generally low coverage and at present is only available for DSM data.
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
@@ -225,8 +225,8 @@ get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_
   in_poly_crs <- sf::st_crs(sf_geom)$epsg
   if (in_poly_crs != 27700){
     message(sprintf('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\
-Polygon will be transformed from EPSG:%s to EPSG:27700 \
-Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
+         Polygon will be transformed from EPSG:%s to EPSG:27700 \
+         Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
     sf_geom <- sf_geom %>%
       sf::st_transform(27700)
 

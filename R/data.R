@@ -35,3 +35,40 @@
 #'
 #' @source London Data Store: https://data.london.gov.uk/dataset/statistical-gis-boundary-files-london
 "city_of_london_sf"
+
+#' EA LiDAR 25cm LiDAR composite extent
+#'
+#' An polygon object of the extent of the EA LiDAR 50cm DTM and DSM composite data
+#'
+#' @format An sf object with a single feature
+#'
+#' @source Defra Portal: https://environment.data.gov.uk/DefraDataDownload/?mapService=EA/SurveyIndexFiles&Mode=spatial
+"lidar_25cm"
+
+
+#' EA LiDAR 50cm LiDAR composite extent
+#'
+#' An polygon object of the extent of the EA LiDAR 50cm DTM and DSM composite data
+#'
+#' @format An sf object with a single feature
+#'
+#' @source Defra Portal: https://environment.data.gov.uk/DefraDataDownload/?mapService=EA/SurveyIndexFiles&Mode=spatial
+"lidar_50cm"
+
+#' EA LiDAR 1m LiDAR composite extent
+#'
+#' An polygon object of the extent of the EA LiDAR 1m DTM and DSM composite data
+#'
+#' @format An sf object with a single feature
+#'
+#' @source Defra Portal: https://environment.data.gov.uk/DefraDataDownload/?mapService=EA/SurveyIndexFiles&Mode=spatial
+"lidar_1m"
+
+#' EA LiDAR 2m LiDAR composite extent
+#'
+#' An polygon object of the extent of the EA LiDAR 2m DTM and DSM composite data
+#'
+#' @format An sf object with a single feature
+#'
+#' @source Defra Portal: https://environment.data.gov.uk/DefraDataDownload/?mapService=EA/SurveyIndexFiles&Mode=spatial
+"lidar_2m"

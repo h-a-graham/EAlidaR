@@ -17,7 +17,7 @@ get_tile(
 \arguments{
 \item{os_tile_name}{A character string denoting thename of the desired OS tile with the form e.g. 'SU66nw' or 'SK36ne'. Beware this is case sensitive.}
 
-\item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+\item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 <1m data has generally low coverage and at present is only available for DSM data.}
 
 \item{model_type}{A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.}
