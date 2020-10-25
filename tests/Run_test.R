@@ -93,18 +93,10 @@ Sys.sleep(0.2)
 render_snapshot(filename = 'man/figures/ExeterRayshade.png')
 
 
-# --------------- Grimwith York Dales Rayshade ----------------------------
+# --------------- City of London York Dales Rayshade ----------------------------
 
 CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 0.5, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
 
-# ggplot() +
-#
-#   annotation_map_tile(type = "osm", zoomin = -1) +
-#   annotation_spatial(city_of_london_sf, size = 2, col = "black", fill = NA) +
-#   layer_spatial(CoL_Ras, alpha = 0.8) +
-#   scale_fill_distiller(na.value = NA, name='Elevation (m)') +
-#   coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
-#   theme_bw()
 
 CoL_Mat = raster_to_matrix(CoL_Ras)
 
