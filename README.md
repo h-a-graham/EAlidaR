@@ -29,6 +29,10 @@ library(EAlidaR)
 library(ggplot2)
 library(ggspatial)
 
+
+check_coverage(poly_area = Ashop_sf, resolution = 2)
+
+
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE)
 
 ggplot() +
@@ -44,7 +48,11 @@ ggplot() +
   coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
   theme_bw()
 ```
-![Ashop Map Example](/man/figures/AshopMap.png)
+           
+:-------------------------:|:-------------------------:
+![Ashop Coverage](/man/figures/AshopCover.png)  |  ![Ashop Map Example](/man/figures/AshopMap.png)
+
+
 
 
 Alternatively, the function `get_tile` downloads data from a single 5km OS tile. Make sure the case is correct in 'os_tile_name' with the first two characters in caps and last two in lower case. 'dest_folder' can be supplied to save the raster(s) in a specified location, otherwise it will be written to tempfile(). 'ras_format'  can be used to specify the raster driver used see `raster::writeFormats()` for options - default is GeoTiff.
