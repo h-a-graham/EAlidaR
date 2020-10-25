@@ -48,7 +48,7 @@ ggplot() +
   coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
   theme_bw()
 ```
-           
+                           |  
 :-------------------------:|:-------------------------:
 ![Ashop Coverage](/man/figures/AshopCover.png)  |  ![Ashop Map Example](/man/figures/AshopMap.png)
 
