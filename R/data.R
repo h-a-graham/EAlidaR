@@ -26,3 +26,12 @@
 #'
 #' @source digitised in QGIS
 "UniOfExeter_sf"
+
+#' An sf object of the City of London Borough
+#'
+#' A polygon sf object for the boundary of the City of London borough
+#'
+#' @format An sf object with a single feature
+#'
+#' @source London Data Store: https://data.london.gov.uk/dataset/statistical-gis-boundary-files-london
+"city_of_london_sf"
