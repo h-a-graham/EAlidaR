@@ -49,8 +49,8 @@ ggplot() +
   theme_bw()
 ```
 <p float="left">
-  <img src="/man/figures/AshopCover.png" width="45%" />
-  <img src="/man/figures/AshopMap.png" width="45%" />
+  <img src="/man/figures/AshopCover.png" width="49%" />
+  <img src="/man/figures/AshopMap.png" width="49%" />
 </p>
 
 
