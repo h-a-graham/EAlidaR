@@ -2,22 +2,28 @@ devtools::load_all()
 library(sf)
 library(ggplot2)
 library(ggspatial)
+library(dplyr)
+library(magrittr)
 
 
 Coverage_gpkg <- system.file("extdata", "LiDAR_extents.gpkg", package = "EAlidaR")
 
 
 lidar_25cm <- read_sf(Coverage_gpkg, layer='LiDAR_extent_25cm') %>%
-  st_make_valid()
+  st_make_valid() %>%
+  select(geom)
 
 lidar_50cm <- read_sf(Coverage_gpkg, layer='LiDAR_extent_50cm') %>%
-  st_make_valid()
+  st_make_valid()%>%
+  select(geom)
 
 lidar_1m <- read_sf(Coverage_gpkg, layer='LiDAR_extent_1m') %>%
-  st_make_valid()
+  st_make_valid()%>%
+  select(geom)
 
 lidar_2m <- read_sf(Coverage_gpkg, layer='LiDAR_extent_2m') %>%
-  st_make_valid()
+  st_make_valid() %>%
+  select(geom)
 
 
 usethis::use_data(lidar_25cm, overwrite = TRUE)
