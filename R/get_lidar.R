@@ -100,9 +100,10 @@ merge_ostiles <- function(ras.folder){
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param quiet Boolean to allow silencing of Errors and return of problem OS tiles when calling from `get_area`.
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_folder, ras_format){
+get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_folder, ras_format, quiet=FALSE){
   oldw <- getOption("warn")
   options(warn = -1)
 
@@ -142,9 +143,11 @@ get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_fol
     download.file(url=web_url, destfile=dest_path, method='auto', quiet = TRUE)
   },
   error=function(cond) {
-    message("\n")
-    message(paste('WARNING: No data is available for tile', os_tile_name ,'with a resolution of', resolution , 'm', sep = " "))  #
-    return()
+    if (isFALSE(quiet)){
+      stop(paste('No data is available for tile', os_tile_name ,'with a resolution of', resolution , 'm', sep = " "))
+    }
+
+    stop(os_tile_name)
   })
 
   exp.fold <- tools::file_path_sans_ext(dest_path)
@@ -172,6 +175,11 @@ resave_rasters <- function(ras, folder, ras_format){
   save_name <- tools::file_path_sans_ext(basename(ras@file@name))
   out_ras <- raster::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW"))
   return(out_ras)
+}
+
+missing_tiles_warn <- function(mod_type, res, tile_str){
+  message(sprintf('WARNING: Coverage incomplete! No %s data was available at a %s m resolution for the following tiles: \
+%s',mod_type, res, tile_str))
 }
 
 #' Get DTM or DSM data for an Area
@@ -250,6 +258,11 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
     ras_format <- "GTiff"
   }
 
+  rasformats <- raster::writeFormats()[,1]
+  if (!(ras_format %in% rasformats)){
+    stop('Requested Raster format not supported. Use raster::writeFormats() to view supported drivers')
+  }
+
   # tiles_5km <- readRDS('data/tile_within10km.rds')
   tiles_5km <- tile_within10km
 
@@ -266,8 +279,7 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
 
   collect_tiles_safe <- function(x) {
     pb$tick()
-    f = purrr::possibly(function() get_tile(os_tile_name = x, resolution = resolution, model_type = model_type),
-                        otherwise = NA_real_, quiet = TRUE) #, quiet = FALSE
+    f = purrr::safely(function() get_tile(os_tile_name = x, resolution = resolution, model_type = model_type, quiet=TRUE))
     f()
   }
 
@@ -277,11 +289,21 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
     purrr::map( ~ collect_tiles_safe(.))
 
   # remove any NA values produced  by missing tiles
-  ras_list <- ras_list[!is.na(ras_list)]
+  error_list <- unlist(purrr::map(ras_list, purrr::pluck, "error", "message"))
+  errs_flagged <- FALSE
+  if (!is.null(error_list)){
+    error_list <- paste(error_list, collapse=', ' )
+    errs_flagged <- TRUE
+  }
+
+  # error_list <- error_list[!is.null(error_list)]
+  ras_list <- unlist(purrr::map(ras_list, purrr::pluck, "result"))
+  # ras_list <- ras_list[!is.null(ras_list)]
 
   if (length(ras_list) == 0 ){
-    stop(sprintf('\nNo data is available for the requested area at a resolution of %s m \n
-consider trying a coarser resolution or check the available coverage.', resolution))
+    stop(sprintf('No %s data was retrieved for the requested area! \
+  The folowing tiles have no %s data at a resolution of %s m: \
+  %s',model_type, model_type, resolution, error_list))
   }
 
 
@@ -304,6 +326,10 @@ consider trying a coarser resolution or check the available coverage.', resoluti
       ras_merge <- raster::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
                                        overwrite=TRUE, options = c("COMPRESS=LZW"))
     }
+    if (isTRUE(errs_flagged)){
+      missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+    }
+
     return(ras_merge)
   } else {
     if (isTRUE(save.tile)){
@@ -311,13 +337,23 @@ consider trying a coarser resolution or check the available coverage.', resoluti
       ras_list <- ras_list %>%
         purrr::map(~ resave_rasters(ras=., folder = dest_folder, ras_format = ras_format))
 
+      if (isTRUE(errs_flagged)){
+        missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+      }
+
       return(ras_list)
+    }
+
+    if (isTRUE(errs_flagged)){
+      missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
     }
     return(ras_list)
   }
 
 
-
+  if (isTRUE(errs_flagged)){
+    missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+  }
 
   return(ras_list)
 }
