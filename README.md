@@ -4,12 +4,12 @@
 An R package to download EA LiDAR composite data for England.
 
 
-This package is very much in development... I would really welcome any comments, suggestions, issues etc. If anything strange crops up please submit and issue here: https://github.com/h-a-graham/EAlidaR/issues 
+This package is in its early days... I would really welcome any comments, suggestions, issues etc. If anything strange crops up please submit and issue here: https://github.com/h-a-graham/EAlidaR/issues 
 
 
 ### Background:
 
-The Environment Agency (EA) provide high resolution, open source elevation datasets for much of England. At present, the best (only?) way to download this data is via the ESRI-based web map portal (https://environment.data.gov.uk/DefraDataDownload/?Mode=survey). This has numerous drawbacks - there are limits to the number of files that can be extracted at any given time, the spatial join between the requested area and available tiles is very slow and the data is provided in zipped files of varying raster formats (mainly ASCII and GeoTiff). 
+The Environment Agency (EA) provide wonderful high resolution, open source elevation datasets for much of England. At present, the best way to download this data is via the ESRI-based web map portal (https://environment.data.gov.uk/DefraDataDownload/?Mode=survey). This has numerous drawbacks - there are limits to the number of files that can be extracted at any given time, the spatial join between the requested area and available tiles is very slow and the data is provided in zipped files of varying raster formats (mainly ASCII and GeoTiff). 
 
 The purpose of this package is to provide a clean and easy way to download and interact directly with these excellent data in R. For completeness, given the development state of this package, there are two main sections if you like:  (1) A front end which provides the main function needed to download the data; namely 'EAlidaR::get_area' and 'EAlidaR::get_tile' - more on these below. (2) Then there is the behind the scenes section which provides the fundamentals of building the database required to access the data. Here the main function of concern is 'EAlidaR::scrape_tile_IDs' which uses Reticulate to utilise python's selenium web driver library. This allows for the automated upload of zipped 10km grid .shp files to the portal and then scrapes the Arc Web Map object IDs from the download URL (no actual data is downloaded in this step). To be honest, I have no idea if these object ID codes will last forever so I'll leave the functions here in case they need to be re-run or if new data becomes available etc.
 
