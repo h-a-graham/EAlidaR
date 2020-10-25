@@ -49,7 +49,7 @@ check_coverage <- function(poly_area, resolution){
     cover_int_area <- sf::st_area(cover_int)
   }
   requested_area <- sf::st_area(sf_geom)
-  perc_cover <- round(cover_int_area/requested_area*100, 2)
+  perc_cover <- round(cover_int_area/requested_area*100, 1)
 
   cover_plot <- ggplot2::ggplot() +
     ggspatial::annotation_map_tile(type = "cartolight", zoomin = -1, ) +
@@ -62,7 +62,7 @@ check_coverage <- function(poly_area, resolution){
 
     ggplot2::coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
 
-    ggplot2::labs(subtitle = stringr::str_c(perc_cover, '% LiDAR coverage for requested area')) +
+    ggplot2::labs(subtitle = stringr::str_c(perc_cover, '% LiDAR coverage for requested are with resoltion of ', resolution, ' m')) +
     ggplot2::theme(legend.title=ggplot2::element_blank())
 
   options(warn = oldw) # reset old warning settings

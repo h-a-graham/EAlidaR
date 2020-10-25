@@ -21,7 +21,7 @@ The purpose of this package is to provide a clean and easy way to download and i
 
 ### Examples:
 
-Here is a simple use case where we download the available 2m DTM data for one of the example regions provided with the package `Ashop_sf`. using the `get_area` function we retrieve a single raster as 'merge_tiles' is TRUE. We can save this data in a desired location with 'dest_folder', 'out_name' and 'ras_format' arguments but, in this case, rasters are stored in the `tempfile()` location and will be available only during the active R session (unless subsequently saved with `raster::writeRaster`).
+Here is a simple use case where we download the available 2m DTM data for one of the example regions provided with the package `Ashop_sf`. First, you can check the availability of data for your region by using `check_coverage` which returns a ggplot of the available coverage (To see national scale coverage use `national_covaerage`). Then, using the `get_area` function we retrieve a single raster as 'merge_tiles' is TRUE. We can save this data in a desired location with 'dest_folder', 'out_name' and 'ras_format' arguments but, in this case, rasters are stored in the `tempfile()` location and will be available only during the active R session (unless subsequently saved with `raster::writeRaster`).
 We then plot the data using the excellent ggspatial package (https://github.com/paleolimbot/ggspatial)
 
 ```
@@ -31,7 +31,7 @@ library(ggspatial)
 
 
 check_coverage(poly_area = Ashop_sf, resolution = 2)
-
+# national_coverage(resolution = 2) # quite slow by the way...
 
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE)
 
