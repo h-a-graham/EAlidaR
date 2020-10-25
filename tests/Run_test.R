@@ -13,9 +13,9 @@ library(rayshader)
 
 # DW_newCRS <- st_transform(Ashop_sf, crs = st_crs(4326))
 
-# area_withfail <- read_sf('tests/Test_Area3.gpkg')
+area_withfail <- read_sf('tests/Test_Area3.gpkg')
 
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 0.25, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
 
 
 
@@ -37,7 +37,7 @@ ggsave(filename = 'man/figures/AshopMap.png', dpi = 600)
 
 # --------- Test Tile download -------------------------
 
-rasTile <- get_tile(os_tile_name = 'SU66nw', resolution = 2, model_type = 'DTM')
+rasTile <- get_tile(os_tile_name = 'SK09se', resolution = 2, model_type = 'DTM')
 
 
 # ------ Ashop Rayshade Example ---------------
