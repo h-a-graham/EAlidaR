@@ -1,6 +1,10 @@
 Package: EAlidaR
 Title: Download EA LiDAR composite datasets directly into R
+<<<<<<< HEAD
 Version: 0.0.1.1
+=======
+Version: 0.0.0.9000
+>>>>>>> master
 Authors@R: 
     person(given = "Hugh",
            family = "Graham",
@@ -24,7 +28,11 @@ Imports:
   ggplot2,
   purrr,
   stringr,
+<<<<<<< HEAD
   progress,
   ggspatial
+=======
+  progress
+>>>>>>> master
 Depends: 
     R (>= 2.10)

@@ -99,7 +99,13 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, zip_shp_folder, pre
 #' @export
 check_tiles <- function(.scrape_out){
 
+<<<<<<< HEAD
   grid_sf <- coverage_10km_sf %>%
+=======
+  # gridpath <- system.file('data', '10km_Grid_LiDAR_inter.gpkg', package = "EAlidaR")
+
+  grid_sf <- km10_Grid_LiDAR_inter %>%
+>>>>>>> master
     # tibble::rownames_to_column(var = "grid_id") %>%
     dplyr::mutate(grid_id = as.numeric(grid_id))%>%
     dplyr::left_join(., .scrape_out$arc_ids, by = c("grid_id"= "tile_n")) %>%
@@ -163,7 +169,11 @@ scrape_to_sf <- function(scrape.obj, out.path){
   arc_id_df <- scrape.obj$arc_ids %>%
     dplyr::filter(arc_code != 'False' | arc_code != 'No 2019 Data')
 
+<<<<<<< HEAD
   grid_sf <- coverage_10km_sf %>%
+=======
+  grid_sf <- sf::read_sf('data/10km_Grid_LiDAR_inter.gpkg') %>%
+>>>>>>> master
     dplyr::right_join(., arc_id_df, by = c("grid_id"= "tile_n"))
 
   coverage_plot <- ggplot2::ggplot() +

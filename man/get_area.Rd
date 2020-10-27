@@ -18,7 +18,11 @@ get_area(
 \arguments{
 \item{poly_area}{Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers}
 
+<<<<<<< HEAD
 \item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
+=======
+\item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+>>>>>>> master
 <1m data has generally low coverage and at present is only available for DSM data.}
 
 \item{model_type}{A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.}

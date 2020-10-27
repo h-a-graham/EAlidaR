@@ -5,5 +5,9 @@ geckodriver.log
 rosm.cache
 **.gpkg-shm
 **.gpkg-wal
+<<<<<<< HEAD
 data-raw/grid_shp_zip/*
 inst/extdata/LiDAR_extents.gpkg
+=======
+tests/grid_shp_zip/*
+>>>>>>> master
