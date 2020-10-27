@@ -1,3 +1,4 @@
+
 #check resolution and import the relevant coverage sf
 model_res_check <- function(.model, .res){
 
@@ -47,7 +48,6 @@ check_coverage <- function(poly_area, model_type, resolution){
   options(warn = -1)
   #check resolution and import the relevant coverage sf
   cover_sf <- model_res_check(.model = model_type, .res = resolution)
-
 
   # check if in polygon in sf obj or path to vector file
   if (class(poly_area)[1] == "sf"){
@@ -106,6 +106,7 @@ check_coverage <- function(poly_area, model_type, resolution){
 #' @return A ggplot object - map of coverage requested and subtitle detailing % cover.
 #' @export
 national_coverage <- function(model_type, resolution){
+
   oldw <- getOption("warn")
   options(warn = -1)
 

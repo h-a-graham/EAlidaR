@@ -1,4 +1,3 @@
-
 devtools::load_all()
 library(sf)
 library(ggplot2)
@@ -78,3 +77,4 @@ show_cover(lidar_1m)
 show_cover(lidar_2m)
 show_cover(lidar_1m_DSM)
 show_cover(lidar_2m_DSM)
+

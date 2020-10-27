@@ -5,7 +5,6 @@ devtools::load_all()
 library(ggplot2)
 library(ggspatial)
 library(sf)
-<<<<<<< HEAD
 library(rayshader)
 
 # -------------- check cover example --------------
@@ -25,38 +24,21 @@ national_coverage(model_type = 'DSM', resolution = 2)
 
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
 
-=======
-
-save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
-
-DW_newCRS <- st_transform(DerwentHeadwater, crs = st_crs(4326))
-
-area_withfail <- read_sf('tests/Test_Area3.gpkg')
-
-rasAreaTest <- get_area(poly_area = DerwentHeadwater, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
->>>>>>> master
 
 
 ggplot() +
   # loads background map tiles from a tile source - rosm::osm.types() for osm options
   annotation_map_tile(type = "osm", zoomin = -1) +
   # requested area
-<<<<<<< HEAD
   annotation_spatial(Ashop_sf, size = 2, col = "black", fill = NA) +
   # raster layer
   layer_spatial(Ashop_Ras, alpha = 0.8) +
-=======
-  annotation_spatial(DerwentHeadwater, size = 2, col = "black", fill = NA) +
-  # raster layer
-  layer_spatial(rasAreaTest, alpha = 0.8) +
->>>>>>> master
   # make no data values transparent
   scale_fill_distiller(na.value = NA, name='Elevation (m)') +
   # get real coords
   coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
   theme_bw()
 
-<<<<<<< HEAD
 ggsave(filename = 'man/figures/AshopMap.png', dpi = 600)
 
 
@@ -80,18 +62,7 @@ AshopMat %>%
 
 Sys.sleep(0.2)
 render_depth(focus = 0.7, focallength = 70, clear = FALSE, filename = 'man/figures/AshopRayshade.png')
-=======
-ggsave(filename = 'man/figures/README_example.png', dpi = 600)
 
-devtools::install_github("tylermorganwall/rayshader")
-
-rasTile <- get_tile(os_tile_name = 'SU66nw', resolution = 2, model_type = 'DTM')
->>>>>>> master
-
-
-
-
-<<<<<<< HEAD
 #  ------------ Exeter Uni Rayshade -------------------
 ExeUniRas <- get_area(poly_area = UniOfExeter_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
 
@@ -126,6 +97,7 @@ Sys.sleep(0.2)
 render_snapshot(filename = 'man/figures/ExeterRayshade.png')
 
 
+
 # --------------- City of London York Dales Rayshade ----------------------------
 
 CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 0.5, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
@@ -142,30 +114,3 @@ CoL_Mat %>%
 
 Sys.sleep(0.2)
 render_depth(focus = 0.7, focallength = 70, clear = FALSE, filename = 'man/figures/CoLRayshade.png')
-=======
-save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST'
-
-rasOB <- get_tile(resolution = 2, model.type = 'DTM' , os.tile.name = 'SU66nw', dest.folder = save_folder)
-rasOB2 <- get_tile(resolution = 2, model.type = 'DSM' , os.tile.name = 'SK36ne')
-
-ggplot() +
-  # loads background map tiles from a tile source - rosm::osm.types() for osm options
-  annotation_map_tile(type = "hillshade", zoomin = -1) +
-
-  # raster layers train scales and get projected automatically
-  layer_spatial(rasAreaTest, alpha = 0.8) +
-  # make no data values transparent
-  scale_fill_viridis_c(na.value = NA) +
-
-  # spatial-aware automagic scale bar
-  annotation_scale(location = "tl") +
-
-  # spatial-aware automagic north arrow
-  annotation_north_arrow(location = "br", which_north = "true") +
-  guides(fill=FALSE)+
-  theme_bw() +
-  labs(fill='Elevation (m)')
-
-
-
->>>>>>> master

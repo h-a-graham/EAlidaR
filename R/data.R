@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 #' An sf object in the upper Ashop River Valley (Peak District)
 #'
 #'  A region in the upper reaches of the Derwent Catchment- an sf object to use as a test example for the EAlidaR package
@@ -92,14 +92,3 @@
 #' @source Defra Portal: https://environment.data.gov.uk/DefraDataDownload/?mapService=EA/SurveyIndexFiles&Mode=spatial
 "lidar_2m_DSM"
 
-
-=======
-#' An sf object in the area of the upper reaches of the Derwent Catchment
-#'
-#' Like it says in the tile - an sf oject to use as a test example for the EAlidaR package
-#'
-#' @format An sf object with asingle feature
-#'
-#' @source created in QGIS/R - it's nothing special!
-"DerwentHeadwater"
->>>>>>> master
