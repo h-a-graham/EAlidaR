@@ -28,7 +28,7 @@ compose_url <- function(res, os.tile, mod.type){
 
   if (res == 1 || res == 2){
     res.str <- sprintf('%sM',res)
-  } else if (res == 0.25 || res == res_cm){
+  } else if (res == 0.25 || res == 0.5){
     res_cm <- res * 100
     res.str <- sprintf('%sCM',res_cm)
   } else {
@@ -38,7 +38,11 @@ compose_url <- function(res, os.tile, mod.type){
   arc_web_id <- get_arc_id(os.tile)
 
   if (mod.type == 'DTM'){
-    download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2019-%s.zip', arc_web_id, res.str, os.tile)
+    if (res == 1 || res == 2){
+      download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2019-%s.zip', arc_web_id, res.str, os.tile)
+    } else if (res == 0.25 || res == 0.5){
+      download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-%s.zip', arc_web_id, res.str, os.tile)
+    }
   } else if (mod.type == 'DSM') {
     download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DSM-%s-%s.zip', arc_web_id, res.str, os.tile)
   }
@@ -90,15 +94,16 @@ merge_ostiles <- function(ras.folder){
 #' if additional rasters are desired get_area() is recomended.
 #'
 #' @param os_tile_name A character string denoting thename of the desired OS tile with the form e.g. 'SU66nw' or 'SK36ne'. Beware this is case sensitive.
-#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 #' <1m data has generally low coverage and at present is only available for DSM data.
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param quiet Boolean to allow silencing of Errors and return of problem OS tiles when calling from `get_area`.
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_folder, ras_format){
+get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_folder, ras_format, quiet=FALSE){
   oldw <- getOption("warn")
   options(warn = -1)
 
@@ -138,8 +143,11 @@ get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_fol
     download.file(url=web_url, destfile=dest_path, method='auto', quiet = TRUE)
   },
   error=function(cond) {
-    message(paste('WARNING: No data is available for tile', os_tile_name ,'with a resolution of', resolution , 'm', sep = " "))  #
-    return()
+    if (isFALSE(quiet)){
+      stop(paste('No data is available for tile', os_tile_name ,'with a resolution of', resolution , 'm', sep = " "))
+    }
+
+    stop(os_tile_name)
   })
 
   exp.fold <- tools::file_path_sans_ext(dest_path)
@@ -169,6 +177,11 @@ resave_rasters <- function(ras, folder, ras_format){
   return(out_ras)
 }
 
+missing_tiles_warn <- function(mod_type, res, tile_str){
+  message(sprintf('WARNING: Coverage incomplete! No %s data was available at a %s m resolution for the following tiles: \
+         %s',mod_type, res, tile_str))
+}
+
 #' Get DTM or DSM data for an Area
 #'
 #' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
@@ -177,7 +190,7 @@ resave_rasters <- function(ras, folder, ras_format){
 #' desired region.
 #'
 #' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
-#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 #' <1m data has generally low coverage and at present is only available for DSM data.
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
@@ -212,8 +225,8 @@ get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_
   in_poly_crs <- sf::st_crs(sf_geom)$epsg
   if (in_poly_crs != 27700){
     message(sprintf('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\
-Polygon will be transformed from EPSG:%s to EPSG:27700 \
-Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
+         Polygon will be transformed from EPSG:%s to EPSG:27700 \
+         Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
     sf_geom <- sf_geom %>%
       sf::st_transform(27700)
 
@@ -245,6 +258,11 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
     ras_format <- "GTiff"
   }
 
+  rasformats <- raster::writeFormats()[,1]
+  if (!(ras_format %in% rasformats)){
+    stop('Requested Raster format not supported. Use raster::writeFormats() to view supported drivers')
+  }
+
   # tiles_5km <- readRDS('data/tile_within10km.rds')
   tiles_5km <- tile_within10km
 
@@ -261,8 +279,7 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
 
   collect_tiles_safe <- function(x) {
     pb$tick()
-    f = purrr::possibly(function() get_tile(os_tile_name = x, resolution = resolution, model_type = model_type),
-                        otherwise = NA_real_, quiet = TRUE) #, quiet = FALSE
+    f = purrr::safely(function() get_tile(os_tile_name = x, resolution = resolution, model_type = model_type, quiet=TRUE))
     f()
   }
 
@@ -272,8 +289,22 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
     purrr::map( ~ collect_tiles_safe(.))
 
   # remove any NA values produced  by missing tiles
-  ras_list <- ras_list[!is.na(ras_list)]
+  error_list <- unlist(purrr::map(ras_list, purrr::pluck, "error", "message"))
+  errs_flagged <- FALSE
+  if (!is.null(error_list)){
+    error_list <- paste(error_list, collapse=', ' )
+    errs_flagged <- TRUE
+  }
 
+  # error_list <- error_list[!is.null(error_list)]
+  ras_list <- unlist(purrr::map(ras_list, purrr::pluck, "result"))
+  # ras_list <- ras_list[!is.null(ras_list)]
+
+  if (length(ras_list) == 0 ){
+    stop(sprintf('No %s data was retrieved for the requested area! \
+  The folowing tiles have no %s data at a resolution of %s m: \
+  %s',model_type, model_type, resolution, error_list))
+  }
 
 
   if (isTRUE(merge_tiles)){
@@ -295,6 +326,10 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
       ras_merge <- raster::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
                                        overwrite=TRUE, options = c("COMPRESS=LZW"))
     }
+    if (isTRUE(errs_flagged)){
+      missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+    }
+
     return(ras_merge)
   } else {
     if (isTRUE(save.tile)){
@@ -302,13 +337,23 @@ Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
       ras_list <- ras_list %>%
         purrr::map(~ resave_rasters(ras=., folder = dest_folder, ras_format = ras_format))
 
+      if (isTRUE(errs_flagged)){
+        missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+      }
+
       return(ras_list)
+    }
+
+    if (isTRUE(errs_flagged)){
+      missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
     }
     return(ras_list)
   }
 
 
-
+  if (isTRUE(errs_flagged)){
+    missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+  }
 
   return(ras_list)
 }

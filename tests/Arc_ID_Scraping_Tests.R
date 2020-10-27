@@ -1,9 +1,9 @@
 # devtools::document()
-# devtools::load_all() # loads package functions
-library(EAlidaR)
+devtools::load_all() # loads package functions
+# library(EAlidaR)
 #create the zipped files for uploading to the defra portal:
+grid_zip_folder<- system.file("extdata", "grid_shp_zip", package = "EAlidaR")
 
-grid_zip_folder <- 'tests/grid_shp_zip'
 create_zip_tiles(out.path = grid_zip_folder)
 
 

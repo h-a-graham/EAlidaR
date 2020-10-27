@@ -10,13 +10,14 @@ get_tile(
   model_type,
   merge_tiles,
   dest_folder,
-  ras_format
+  ras_format,
+  quiet = FALSE
 )
 }
 \arguments{
 \item{os_tile_name}{A character string denoting thename of the desired OS tile with the form e.g. 'SU66nw' or 'SK36ne'. Beware this is case sensitive.}
 
-\item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. 2019 DTM data is only available in 1 or 2m.
+\item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 <1m data has generally low coverage and at present is only available for DSM data.}
 
 \item{model_type}{A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.}
@@ -26,6 +27,8 @@ get_tile(
 \item{dest_folder}{Optional character string for output save folder. If not provided rasters will be stored in tempfile()}
 
 \item{ras_format}{Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()}
+
+\item{quiet}{Boolean to allow silencing of Errors and return of problem OS tiles when calling from `get_area`.}
 }
 \value{
 A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
