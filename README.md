@@ -2,7 +2,7 @@
 <img src="/man/figures/CoLRayshade.png" width="70%">
 
 An R package to download EA LiDAR composite data for England.
-
+So you're aware, Data downloaded with this package is licensed under the [Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
 
 This package is in its early days... I would really welcome any comments, suggestions, issues etc. If anything strange crops up please submit and issue here: https://github.com/h-a-graham/EAlidaR/issues 
 
