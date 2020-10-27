@@ -4,10 +4,12 @@
 \alias{check_coverage}
 \title{Check the availble coverage for LiDAR mosaics for a given area}
 \usage{
-check_coverage(poly_area, resolution)
+check_coverage(poly_area, model_type, resolution)
 }
 \arguments{
 \item{poly_area}{Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers}
+
+\item{model_type}{A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.}
 
 \item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.}
 }
