@@ -29,9 +29,8 @@ library(EAlidaR)
 library(ggplot2)
 library(ggspatial)
 
-
-check_coverage(poly_area = Ashop_sf, resolution = 2)
-# national_coverage(resolution = 2) # quite slow by the way...
+# national_coverage(model_type = 'DSM', resolution = 2) # quite slow by the way...
+check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 2)
 
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE)
 
