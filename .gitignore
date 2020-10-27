@@ -6,3 +6,4 @@ rosm.cache
 **.gpkg-shm
 **.gpkg-wal
 data-raw/grid_shp_zip/*
+inst/extdata/LiDAR_extents.gpkg
