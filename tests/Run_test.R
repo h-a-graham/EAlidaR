@@ -9,11 +9,11 @@ library(rayshader)
 
 # -------------- check cover example --------------
 
-check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 2)
+check_coverage(poly_area = Ashop_sf, model_type = 'DSM', resolution = 2)
 ggsave(filename = 'man/figures/AshopCover.png', dpi = 600)
 
 
-national_coverage(model_type = 'DSM', resolution = 2)
+national_coverage(model_type = 'DTM', resolution = 2)
 
 # ---------- Ashop download and map example ------------------
 # save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
@@ -63,9 +63,6 @@ AshopMat %>%
 Sys.sleep(0.2)
 render_depth(focus = 0.7, focallength = 70, clear = FALSE, filename = 'man/figures/AshopRayshade.png')
 
-
-
-
 #  ------------ Exeter Uni Rayshade -------------------
 ExeUniRas <- get_area(poly_area = UniOfExeter_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
 
@@ -98,6 +95,7 @@ ExeterMat %>%
 
 Sys.sleep(0.2)
 render_snapshot(filename = 'man/figures/ExeterRayshade.png')
+
 
 
 # --------------- City of London York Dales Rayshade ----------------------------

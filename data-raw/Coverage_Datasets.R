@@ -6,8 +6,9 @@ library(ggspatial)
 library(dplyr)
 library(magrittr)
 
-Coverage_gpkg <- system.file("extdata", "LiDAR_extents.gpkg", package = "EAlidaR")
-grid50km <- read_sf(system.file("data-raw", "50km_grid.gpkg", package = "EAlidaR"))
+Coverage_gpkg <- system.file("extdata/raw_vectors", "LiDAR_extents.gpkg", package = "EAlidaR")
+DSM_Coverage_gpkg <- system.file("extdata/raw_vectors", "DSM_LiDAR_extents.gpkg", package = "EAlidaR")
+grid50km <- read_sf(system.file("data-raw/raw_vectors", "50km_grid.gpkg", package = "EAlidaR"))
 
 
 lidar_25cm <- read_sf(Coverage_gpkg, layer='LiDAR_extent_25cm') %>%
@@ -35,7 +36,7 @@ lidar_2m <- read_sf(Coverage_gpkg, layer='LiDAR_extent_2m') %>%
   summarise()%>%
   select(geom)
 
-lidar_1m_DSM <- read_sf(Coverage_gpkg, layer='LiDAR_extent_DSM') %>%
+lidar_1m_DSM <- read_sf(DSM_Coverage_gpkg, layer='LiDAR_extent_DSM') %>%
   filter(resolution != 2)%>%
   st_join(grid50km) %>%
   group_by(TILE_NAME)%>%
@@ -45,7 +46,7 @@ lidar_1m_DSM <- read_sf(Coverage_gpkg, layer='LiDAR_extent_DSM') %>%
 object.size(lidar_1m_DSM)
 
 
-lidar_2m_DSM <- read_sf(Coverage_gpkg, layer='LiDAR_extent_DSM') %>%
+lidar_2m_DSM <- read_sf(DSM_Coverage_gpkg, layer='LiDAR_extent_DSM') %>%
   st_join(grid50km) %>%
   group_by(TILE_NAME)%>%
   summarise()%>%
