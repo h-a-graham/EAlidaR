@@ -120,6 +120,9 @@ get_tile <- function(os_tile_name, resolution, model_type, merge_tiles, dest_fol
     save.tile <- FALSE
   } else {
     save.tile <- TRUE
+    if (isFALSE(is_absolute_path(dest_folder))){
+      dest_folder <- normalizePath(file.path(dest_folder))
+    }
   }
 
   if (missing(merge_tiles)){
