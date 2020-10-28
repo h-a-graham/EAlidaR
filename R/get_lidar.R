@@ -94,8 +94,7 @@ merge_ostiles <- function(ras.folder){
 #' if additional rasters are desired get_area() is recomended.
 #'
 #' @param os_tile_name A character string denoting thename of the desired OS tile with the form e.g. 'SU66nw' or 'SK36ne'. Beware this is case sensitive.
-#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
-#' <1m data has generally low coverage and at present is only available for DSM data.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. <1m data has generally low coverage.
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
@@ -190,8 +189,7 @@ missing_tiles_warn <- function(mod_type, res, tile_str){
 #' desired region.
 #'
 #' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
-#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
-#' <1m data has generally low coverage and at present is only available for DSM data.
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. <1m data has generally low coverage.
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
 #' @param crop Boolean with default FALSE. If TRUE data outside the bounds of the requested polygon area are discarded.
