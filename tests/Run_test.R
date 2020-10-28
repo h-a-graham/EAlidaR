@@ -16,13 +16,15 @@ ggsave(filename = 'man/figures/AshopCover.png', dpi = 600)
 national_coverage(model_type = 'DTM', resolution = 2)
 
 # ---------- Ashop download and map example ------------------
-# save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
-
+save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
+save_folder2 <- 'tests/save_tests'
 # DW_newCRS <- st_transform(Ashop_sf, crs = st_crs(4326))
 
 # area_withfail <- read_sf(system.file("extdata", "Test_Area3.gpkg", package = "EAlidaR"))
 
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE) #, dest.folder = save_folder, out.name = 'TESTAREA'
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE,
+                      dest_folder = save_folder2, out_name = 'test1') #, dest.folder = save_folder, out.name = 'TESTAREA'
+
 
 
 

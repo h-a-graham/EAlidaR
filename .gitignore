@@ -7,3 +7,4 @@ rosm.cache
 **.gpkg-wal
 data-raw/grid_shp_zip/*
 data-raw/raw_vectors/*
+tests/save_tests/*

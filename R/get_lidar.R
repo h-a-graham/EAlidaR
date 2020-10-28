@@ -1,4 +1,6 @@
-
+is_absolute_path <- function(path) {
+  grepl("^(/|[A-Za-z]:|\\\\|~)", path)
+}
 
 get_arc_id <- function(tile.string){
   req_tile <- stringr::str_to_upper(tile.string)
@@ -237,6 +239,12 @@ get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_
     message('No destination folder provided - saving to temp directory..\n')
   }else {
     save.tile <- TRUE
+
+    if (isFALSE(is_absolute_path(dest_folder))){
+      wrkdir <- getwd()
+      dest_folder <- file.path(wrkdir, dest_folder)
+    }
+
   }
 
   if (missing(merge_tiles)){
