@@ -14,6 +14,6 @@ Defra Portal: https://environment.data.gov.uk/DefraDataDownload/?mapService=EA/S
 lidar_2m
 }
 \description{
-An polygon object of the extent of the EA LiDAR 2m DTM and DSM composite data
+An polygon object of the extent of the EA LiDAR 2m DTM composite data
 }
 \keyword{datasets}

@@ -4,9 +4,11 @@
 \alias{national_coverage}
 \title{Show the availble coverage for LiDAR mosaics Nationally}
 \usage{
-national_coverage(resolution)
+national_coverage(model_type, resolution)
 }
 \arguments{
+\item{model_type}{A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.}
+
 \item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2}
 }
 \value{

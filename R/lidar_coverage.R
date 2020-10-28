@@ -1,27 +1,53 @@
+#check resolution and import the relevant coverage sf
+model_res_check <- function(.model, .res){
+
+  if (.model == 'DTM'){
+    if (.res == 0.25){
+      cover_sf <- lidar_25cm
+    } else if(.res == 0.5){
+      cover_sf <- lidar_50cm
+    } else if(.res == 1){
+      cover_sf <- lidar_1m
+    } else if(.res == 2){
+      cover_sf <- lidar_2m
+    } else {
+      stop('The resolution requested is not available options are: 0.25, 0.5, 1 and 2')
+    }
+  } else if (.model == 'DSM'){
+    if (.res == 0.25){
+      cover_sf <- lidar_25cm
+    } else if(.res == 0.5){
+      cover_sf <- lidar_50cm
+    } else if(.res == 1){
+      cover_sf <- lidar_1m_DSM
+    } else if(.res == 2){
+      cover_sf <- lidar_2m_DSM
+    } else {
+      stop('The resolution requested is not available options are: 0.25, 0.5, 1 and 2')
+    }
+  } else {
+    stop('Only "DTM" and "DSM" model types are supported at present.')
+  }
+  return(cover_sf)
+}
+
+
 
 #' Check the availble coverage for LiDAR mosaics for a given area
 #'
 #' This function checks the amount of coverage offered by the LiDAR mosaic of a given resolution for an area of interest
 #'
 #' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
+#' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 #' @return A ggplot object - map of coverage requested and subtitle detailing % cover.
 #' @export
-check_coverage <- function(poly_area, resolution){
+check_coverage <- function(poly_area, model_type, resolution){
   oldw <- getOption("warn")
   options(warn = -1)
   #check resolution and import the relevant coverage sf
-  if (resolution == 0.25){
-    cover_sf <- lidar_25cm
-  } else if(resolution == 0.5){
-    cover_sf <- lidar_50cm
-  } else if(resolution == 1){
-    cover_sf <- lidar_1m
-  } else if(resolution == 2){
-    cover_sf <- lidar_2m
-  } else {
-    stop('The resolution requested is not available options are: 0.25, 0.5, 1 and 2')
-  }
+  cover_sf <- model_res_check(.model = model_type, .res = resolution)
+
 
   # check if in polygon in sf obj or path to vector file
   if (class(poly_area)[1] == "sf"){
@@ -62,7 +88,7 @@ check_coverage <- function(poly_area, resolution){
 
     ggplot2::coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
 
-    ggplot2::labs(subtitle = stringr::str_c(perc_cover, '% LiDAR coverage for requested are with resoltion of ', resolution, ' m')) +
+    ggplot2::labs(subtitle = sprintf('%s %% LiDAR %s m %s coverage for requested area', perc_cover, resolution, model_type)) +
     ggplot2::theme(legend.title=ggplot2::element_blank())
 
   options(warn = oldw) # reset old warning settings
@@ -75,25 +101,16 @@ check_coverage <- function(poly_area, resolution){
 #'
 #' This function plots the coverage available for the LiDAR mosaic of a given resolution for England
 #'
+#' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2
 #' @return A ggplot object - map of coverage requested and subtitle detailing % cover.
 #' @export
-national_coverage <- function(resolution){
+national_coverage <- function(model_type, resolution){
   oldw <- getOption("warn")
   options(warn = -1)
 
   #check resolution and import the relevant coverage sf
-  if (resolution == 0.25){
-    cover_sf <- lidar_25cm
-  } else if(resolution == 0.5){
-    cover_sf <- lidar_50cm
-  } else if(resolution == 1){
-    cover_sf <- lidar_1m
-  } else if(resolution == 2){
-    cover_sf <- lidar_2m
-  } else {
-    stop('The resolution requested is not available options are: 0.25, 0.5, 1 and 2')
-  }
+  cover_sf <- model_res_check(.model = model_type, .res = resolution)
 
   fill_lab <- sprintf('Available %s m Data', resolution)
   cover_plot <- ggplot2::ggplot() +
@@ -106,7 +123,7 @@ national_coverage <- function(resolution){
 
     ggplot2::coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
 
-    ggplot2::labs(subtitle = sprintf('Extent of Available LiDAR composite data at a resolution of %s m', resolution)) +
+    ggplot2::labs(subtitle = sprintf('Extent of Available LiDAR %s m %s composite data', resolution, model_type)) +
     ggplot2::theme(legend.title=ggplot2::element_blank())
 
   options(warn = oldw) # reset old warning settings

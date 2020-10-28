@@ -3,7 +3,7 @@
 \docType{data}
 \name{lidar_1m}
 \alias{lidar_1m}
-\title{EA LiDAR 1m LiDAR composite extent}
+\title{EA LiDAR 1m LiDAR DTM composite extent}
 \format{
 An sf object with a single feature
 }
@@ -14,6 +14,6 @@ Defra Portal: https://environment.data.gov.uk/DefraDataDownload/?mapService=EA/S
 lidar_1m
 }
 \description{
-An polygon object of the extent of the EA LiDAR 1m DTM and DSM composite data
+An polygon object of the extent of the EA LiDAR 1m DTM composite data
 }
 \keyword{datasets}

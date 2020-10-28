@@ -2,7 +2,7 @@
 <img src="/man/figures/CoLRayshade.png" width="70%">
 
 An R package to download EA LiDAR composite data for England.
-
+So you're aware, Data downloaded with this package is licensed under the [Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
 
 This package is in its early days... I would really welcome any comments, suggestions, issues etc. If anything strange crops up please submit and issue here: https://github.com/h-a-graham/EAlidaR/issues 
 
@@ -29,9 +29,8 @@ library(EAlidaR)
 library(ggplot2)
 library(ggspatial)
 
-
-check_coverage(poly_area = Ashop_sf, resolution = 2)
-# national_coverage(resolution = 2) # quite slow by the way...
+# national_coverage(model_type = 'DSM', resolution = 2) # quite slow by the way...
+check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 2)
 
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE)
 
