@@ -241,8 +241,7 @@ get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_
     save.tile <- TRUE
 
     if (isFALSE(is_absolute_path(dest_folder))){
-      wrkdir <- getwd()
-      dest_folder <- file.path(wrkdir, dest_folder)
+      dest_folder <- normalizePath(file.path(dest_folder))
     }
 
   }
