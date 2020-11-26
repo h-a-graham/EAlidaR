@@ -1,6 +1,9 @@
 # EAlidaR
 <img src="/man/figures/CoLRayshade.png" width="70%">
 
+
+**Unfortunately, it seem that the approach I took with this package is not particularly stable. I have re run the scraping but already some of the tiles are failing to load data. Hopefully, we'll be able to find a solution soon - if you have any ideas please let me know in the issues section**
+
 An R package to download EA LiDAR composite data for England.
 So you're aware, Data downloaded with this package is licensed under the [Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
 

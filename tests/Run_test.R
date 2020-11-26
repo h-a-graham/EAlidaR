@@ -102,7 +102,7 @@ render_snapshot(filename = 'man/figures/ExeterRayshade.png')
 
 # --------------- City of London Rayshade ----------------------------
 
-CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 0.5, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
+CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
 
 
 CoL_Mat = raster_to_matrix(CoL_Ras)
