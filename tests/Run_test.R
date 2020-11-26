@@ -10,7 +10,7 @@ library(rayshader)
 # -------------- check cover example --------------
 
 check_coverage(poly_area = Ashop_sf, model_type = 'DSM', resolution = 2)
-ggsave(filename = 'man/figures/AshopCover.png', dpi = 600)
+# ggsave(filename = 'man/figures/AshopCover.png', dpi = 600)
 
 
 national_coverage(model_type = 'DTM', resolution = 2)
@@ -100,7 +100,7 @@ render_snapshot(filename = 'man/figures/ExeterRayshade.png')
 
 
 
-# --------------- City of London York Dales Rayshade ----------------------------
+# --------------- City of London Rayshade ----------------------------
 
 CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 0.5, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
 

@@ -99,7 +99,10 @@ scrape_tile_IDs <- function(conda_path, env_name, gecko_exe, zip_shp_folder, pre
 #' @export
 check_tiles <- function(.scrape_out){
 
-  grid_sf <- coverage_10km_sf %>%
+  coverage_10km_sf.ed <- coverage_10km_sf %>%
+    dplyr::select(TILE_NAME, grid_id, geom)
+
+  grid_sf <- coverage_10km_sf.ed %>%
     # tibble::rownames_to_column(var = "grid_id") %>%
     dplyr::mutate(grid_id = as.numeric(grid_id))%>%
     dplyr::left_join(., .scrape_out$arc_ids, by = c("grid_id"= "tile_n")) %>%
@@ -159,11 +162,14 @@ saveRDS(scrape.obj, file = save_path)
 #' @export
 scrape_to_sf <- function(scrape.obj, out.path){
 
+  coverage_10km_sf.ed <- coverage_10km_sf %>%
+    dplyr::select(TILE_NAME, grid_id, geom)
 
   arc_id_df <- scrape.obj$arc_ids %>%
-    dplyr::filter(arc_code != 'False' | arc_code != 'No 2019 Data')
+    dplyr::filter(arc_code != 'False' ) %>%
+    dplyr::filter(arc_code != 'NO_DTM_COMP')
 
-  grid_sf <- coverage_10km_sf %>%
+  grid_sf <- coverage_10km_sf.ed %>%
     dplyr::right_join(., arc_id_df, by = c("grid_id"= "tile_n"))
 
   coverage_plot <- ggplot2::ggplot() +
