@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options
 
 import pyautogui
 import pandas as pd
@@ -47,7 +48,13 @@ def scrapestuff(gecko_exe, zip_list):
   
   
   for chunk in zip_chunks:
-    browser = webdriver.Firefox(executable_path = gecko_exe)
+    options = Options()
+    options.headless  = True
+    options.add_argument("--window-size=1920,1080")
+    # options.add_argument("--headless")
+    
+    browser = webdriver.Firefox(options=options, executable_path = gecko_exe)
+    # browser = webdriver.Firefox(executable_path = gecko_exe)
     browser.implicitly_wait(20)
     browser.get(link)
     WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#polygon')))
@@ -63,15 +70,16 @@ def scrapestuff(gecko_exe, zip_list):
         # Wait for loading screen to go and then click on upload button
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > img:nth-child(2)')))
-        WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#buttonid'))).click()
+        # WebDriverWait(browser, 60).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#buttonid'))).click()
         
+        WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#fileid'))).send_keys(file) # This is the solution!
         
-        #send file to windows pop up
-        time.sleep(2)
-        pyautogui.write(file) 
-        time.sleep(2)
-        pyautogui.press('enter')
-        time.sleep(2)
+        # #send file to windows pop up
+        # time.sleep(2)
+        # pyautogui.write(file) 
+        # time.sleep(2)
+        # pyautogui.press('enter')
+        # time.sleep(2)
         
         # Wait for loading screen to go and then click 'get available tiles'
         WebDriverWait(browser, 60).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#dojox_widget_Standby_0 > div:nth-child(1)')))
@@ -95,13 +103,17 @@ def scrapestuff(gecko_exe, zip_list):
         for index in range(1, len(options)-1):
             option_list.append(options[index].text)
         
-        if 'LIDAR Composite DTM' in option_list:
+        if 'LIDAR Composite DTM' in option_list or 'LIDAR Composite DSM' in option_list:
           # print('YAY')
         
         
           # time.sleep(1)
-          select.select_by_visible_text('LIDAR Composite DTM')
-          time.sleep(1)
+          if 'LIDAR Composite DTM' in option_list:
+            select.select_by_visible_text('LIDAR Composite DTM')
+            time.sleep(1) 
+          else:
+            select.select_by_visible_text('LIDAR Composite DSM')
+            time.sleep(1)
           
           # down_link = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,'.data-ready-container > a:nth-child(1)')).get_property('href')  
           # get first link for download
