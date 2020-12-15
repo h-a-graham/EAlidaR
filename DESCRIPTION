@@ -25,6 +25,7 @@ Imports:
   purrr,
   stringr,
   progress,
-  ggspatial
+  ggspatial,
+  RSelenium
 Depends: 
     R (>= 2.10)

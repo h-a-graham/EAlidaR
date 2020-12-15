@@ -22,8 +22,8 @@ save_folder2 <- 'tests/save_tests'
 
 # area_withfail <- read_sf(system.file("extdata", "Test_Area3.gpkg", package = "EAlidaR"))
 
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE,
-                      dest_folder = save_folder2, out_name = 'test1') #, dest.folder = save_folder, out.name = 'TESTAREA'
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
+                      # dest_folder = save_folder2, out_name = 'test1') #, dest.folder = save_folder, out.name = 'TESTAREA'
 
 
 

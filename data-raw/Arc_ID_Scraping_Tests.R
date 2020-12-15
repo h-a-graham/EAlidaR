@@ -3,7 +3,7 @@ devtools::load_all() # loads package functions
 # library(EAlidaR)
 #create the zipped files for uploading to the defra portal:
 contain_direc<- system.file("data-raw", package = "EAlidaR")
-grid_zip_folder<- system.file("data-raw", "grid_shp_zip", package = "EAlidaR")
+grid_zip_folder<- system.file("data-raw", "grid_shp_zip_test", package = "EAlidaR")
 
 # create_zip_tiles(out.path = contain_direc)
 

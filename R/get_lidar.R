@@ -7,10 +7,10 @@ get_arc_id <- function(tile.string){
 
   # print(coverage_10km_sf)
   # t10km_path <- system.file('data', 'coverage_10km_sf.rds', package = "EAlidaR")
-  tiles_10km <- coverage_10km_sf
+  tiles_10km <- grid_10km_sf
 
   # t5km_path <- system.file('data', 'tile_within10km.rds', package = "EAlidaR")
-  tiles_5km <- tile_within10km
+  tiles_5km <- grid_5km_sf
 
   sf::st_agr(tiles_10km) = "constant"
   sf::st_agr(tiles_5km) = "constant"
@@ -68,26 +68,7 @@ join_paths <- function(p1, p2){
 
 
 
-merge_ostiles <- function(ras.folder){
-  ras.list <- list.files(ras.folder)
-  ras.list <- purrr::discard(ras.list , grepl(".tif.xml|.tfw|index", ras.list ))
 
-  ras.list <- lapply(ras.list, join_paths, p2=ras.folder)
-
-  if (length(ras.list) > 1){
-    ras.list <- lapply(ras.list, read_raster)
-    ras.merge <- do.call(raster::merge, ras.list)
-  } else if(length(ras.list) == 1){
-
-    ras.merge <- raster::raster(file.path(ras.list[[1]]))
-
-  }
-
-  raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700')
-
-
-  return(ras.merge)
-}
 
 #' Get DTM or DSM Data for a 5km Ordnance Survey (OS) Tile
 #'
@@ -196,6 +177,7 @@ missing_tiles_warn <- function(mod_type, res, tile_str){
 #' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
 #' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. <1m data has generally low coverage.
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param chrome_version The chrome version that best matches your own chrome installation version. Choose from binman::list_versions("chromedriver")
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
 #' @param crop Boolean with default FALSE. If TRUE data outside the bounds of the requested polygon area are discarded.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
@@ -203,7 +185,7 @@ missing_tiles_warn <- function(mod_type, res, tile_str){
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_folder, out_name, ras_format){
+get_area <- function(poly_area, resolution, model_type, chrome_version, merge_tiles, crop, dest_folder, out_name, ras_format){
 
   if (isFALSE(merge_tiles) && !missing(dest_folder) && !missing(out_name)){
     message('"out.name" ignored when saving multiple rasters i.e when "merge.type" = FALSE\n')
@@ -271,41 +253,53 @@ get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_
     stop('Requested Raster format not supported. Use raster::writeFormats() to view supported drivers')
   }
 
-  # tiles_5km <- readRDS('data/tile_within10km.rds')
-  tiles_5km <- tile_within10km
 
   sf::st_agr(sf_geom) = "constant"
+
+  tiles_5km <- grid_5km_sf
   sf::st_agr(tiles_5km) = "constant"
+
+  tiles_10km <- grid_10km_sf
+    sf::st_agr(tiles_10km) = "constant"
 
   tile_5km_inter <- tiles_5km %>%
     sf::st_intersection(sf_geom)%>%
     dplyr::pull(TILE_NAME) %>%
     gsub("([0-9]\\D+)", "\\L\\1",.,perl=TRUE)
 
-  pb <- progress::progress_bar$new(total = length(tile_5km_inter),
-                                   clear = FALSE)
+  tile_10km_inter <- tiles_10km %>%
+    sf::st_intersection(sf_geom)%>%
+    dplyr::pull(TILE_NAME) %>%
+    gsub("([0-9]\\D+)", "\\L\\1",.,perl=TRUE)
 
-  collect_tiles_safe <- function(x) {
-    pb$tick()
-    f = purrr::safely(function() get_tile(os_tile_name = x, resolution = resolution, model_type = model_type, quiet=TRUE))
-    f()
-  }
+  # pb <- progress::progress_bar$new(total = length(tile_5km_inter),
+  #                                  clear = FALSE)
+  #
+  # collect_tiles_safe <- function(x) {
+  #   pb$tick()
+  #   f = purrr::safely(function() get_tile(os_tile_name = x, resolution = resolution, model_type = model_type, quiet=TRUE))
+  #   f()
+  # }
+  #
+  #
+  # message('Downloading Tiles...')
+  # ras_list <- tile_5km_inter %>%
+  #   purrr::map( ~ collect_tiles_safe(.))
 
 
-  message('Downloading Tiles...')
-  ras_list <- tile_5km_inter %>%
-    purrr::map( ~ collect_tiles_safe(.))
+  ras_list <- get_tiles(tile_list10km = tile_10km_inter, tile_list5km = tile_5km_inter, chrome_ver = chrome_version,
+                        resolution = resolution, mod_type=model_type)
 
   # remove any NA values produced  by missing tiles
-  error_list <- unlist(purrr::map(ras_list, purrr::pluck, "error", "message"))
-  errs_flagged <- FALSE
-  if (!is.null(error_list)){
-    error_list <- paste(error_list, collapse=', ' )
-    errs_flagged <- TRUE
-  }
+  # error_list <- unlist(purrr::map(ras_list, purrr::pluck, "error", "message"))
+  # errs_flagged <- FALSE
+  # if (!is.null(error_list)){
+  #   error_list <- paste(error_list, collapse=', ' )
+  #   errs_flagged <- TRUE
+  # }
 
   # error_list <- error_list[!is.null(error_list)]
-  ras_list <- unlist(purrr::map(ras_list, purrr::pluck, "result"))
+  # ras_list <- unlist(purrr::map(ras_list, purrr::pluck, "result"))
   # ras_list <- ras_list[!is.null(ras_list)]
 
   if (length(ras_list) == 0 ){
@@ -334,9 +328,9 @@ get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_
       ras_merge <- raster::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
                                        overwrite=TRUE, options = c("COMPRESS=LZW"))
     }
-    if (isTRUE(errs_flagged)){
-      missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
-    }
+    # if (isTRUE(errs_flagged)){
+    #   missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+    # }
 
     return(ras_merge)
   } else {
@@ -345,23 +339,23 @@ get_area <- function(poly_area, resolution, model_type, merge_tiles, crop, dest_
       ras_list <- ras_list %>%
         purrr::map(~ resave_rasters(ras=., folder = dest_folder, ras_format = ras_format))
 
-      if (isTRUE(errs_flagged)){
-        missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
-      }
+      # if (isTRUE(errs_flagged)){
+      #   missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+      # }
 
       return(ras_list)
     }
 
-    if (isTRUE(errs_flagged)){
-      missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
-    }
+    # if (isTRUE(errs_flagged)){
+    #   missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+    # }
     return(ras_list)
   }
 
 
-  if (isTRUE(errs_flagged)){
-    missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
-  }
+  # if (isTRUE(errs_flagged)){
+  #   missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
+  # }
 
   return(ras_list)
 }
