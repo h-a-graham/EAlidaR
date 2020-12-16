@@ -6,7 +6,7 @@ zip_shp <- function(.val, .path, .sfObj){
   feature <- .val %>%
     sf::st_sfc()%>%
     sf::st_set_crs(sf::st_crs(.sfObj)) %>%
-    sf::st_buffer(-500)
+    sf::st_buffer(-1)
 
   cell.name <- feature %>%
     sf::st_intersection(.sfObj, .) %>%

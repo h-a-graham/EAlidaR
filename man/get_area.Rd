@@ -8,6 +8,7 @@ get_area(
   poly_area,
   resolution,
   model_type,
+  chrome_version,
   merge_tiles,
   crop,
   dest_folder,
@@ -21,6 +22,8 @@ get_area(
 \item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. <1m data has generally low coverage.}
 
 \item{model_type}{A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.}
+
+\item{chrome_version}{The chrome version that best matches your own chrome installation version. Choose from binman::list_versions("chromedriver")}
 
 \item{merge_tiles}{Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.}
 

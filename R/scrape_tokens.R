@@ -1,16 +1,3 @@
-#Notes:
-# Okay - had some issues with the rsDriver set up. Problem seemed to be caused by an issue with JAVA paths:
-# followed advice here: https://stackoverflow.com/questions/6362037/java-error-opening-registry-key
-# Basically deleted the Oracle folder in 'C:\ProgramData\' and then reinstalled Java - now seems to work okay...
-
-# The above is probably not an issue now if we use chrome. We can ask the user to provide a chrome version
-# as discussed here: https://github.com/ropensci/RSelenium/issues/203 and then if they can select a version from:
-# binman::list_versions("chromedriver") that best matches their chrome version...
-
-
-# define chrome options
-# devtools::install_github("ropensci/RSelenium")
-# remotes::install_github("ropensci/wdman")
 
 # alternative to Rselenium implicit time out: https://github.com/ropensci/RSelenium/issues/212
 timeouts <- function (driver, milliseconds)
@@ -24,12 +11,12 @@ timeouts <- function (driver, milliseconds)
 # function to wait max of 50s until loading screen disappears.
 wait_for_load <- function(driver){
   start_time <- Sys.time()
-    loading_el1  <- driver$findElement(using = 'css selector', '#dojox_widget_Standby_0 > img:nth-child(2)')
-    while(isTRUE(loading_el1$isElementDisplayed()[[1]])){
-      if (as.numeric(start_time-Sys.time())>50){
-        stop('Time out on loading screen!')
-      }
+  loading_el1  <- driver$findElement(using = 'css selector', '#dojox_widget_Standby_0 > img:nth-child(2)')
+  while(isTRUE(loading_el1$isElementDisplayed()[[1]])){
+    if (as.numeric(start_time-Sys.time())>50){
+      stop('Time out on loading screen!')
     }
+  }
 
 
 }
@@ -130,8 +117,8 @@ compose_zip_paths <- function(save.folder, web.add){
 
 download_data <- function(web_url, dest_dir, os_tile_name, resolution, quiet=TRUE){
   dest_path <- compose_zip_paths(dest_dir, web_url)
-    download.file(url=web_url, destfile=dest_path, method='auto', quiet = T) # change quiet to true after testing
-    return(dest_path)
+  download.file(url=web_url, destfile=dest_path, method='auto', quiet = T) # change quiet to true after testing
+  return(dest_path)
 
 }
 
@@ -144,22 +131,40 @@ unzip_files <- function(dest_path){
 }
 
 
+
 merge_ostiles <- function(ras.folder){
+  # functions required for tile merging...
+  read_raster <- function(ras.path){
+    suppressWarnings(ras <- raster::raster(ras.path))
+    suppressWarnings(raster::crs(ras) <- sp::CRS('+init=EPSG:27700')) #'+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +units=m +no_defs'
+    return(ras)
+  }
+
+  join_paths <- function(p1, p2){
+    file.path(p2, p1)
+  }
+
   ras.list <- list.files(ras.folder)
+
+  if (dir.exists(file.path(ras.folder,ras.list[1]))){
+    ras.folder <- file.path(ras.folder,ras.list)
+    ras.list <- list.files(ras.folder)
+  }
+
   ras.list <- purrr::discard(ras.list , grepl(".tif.xml|.tfw|index", ras.list ))
 
   ras.list <- lapply(ras.list, join_paths, p2=ras.folder)
 
   if (length(ras.list) > 1){
     ras.list <- lapply(ras.list, read_raster)
-    ras.merge <- do.call(raster::merge, ras.list)
+    suppressWarnings(ras.merge <- do.call(raster::merge, ras.list))
   } else if(length(ras.list) == 1){
 
-    ras.merge <- raster::raster(file.path(ras.list[[1]]))
+    suppressWarnings(ras.merge <- raster::raster(file.path(ras.list[[1]])))
 
   }
 
-  raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700')
+  suppressWarnings(raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700'))
 
 
   return(ras.merge)
@@ -183,7 +188,6 @@ get_data <- function(token_df, res, mod.type, save_dir, merge_Tiles, save_tile){
   tile_data <- NULL
   if (mod.type == 'DTM'){
     if (res == 1){
-
       st_year <- 2020
       while(is.null(tile_data)){
         if (st_year == 2016) break;
@@ -223,8 +227,7 @@ get_data <- function(token_df, res, mod.type, save_dir, merge_Tiles, save_tile){
 
 
   if(is.null(tile_data)){
-    tile_data <- 'NO_DATA_RETURNED'
-    return(tile_data)
+    stop(os.tile)
   }
 
   dest_path <- (unzip_files(tile_data))
@@ -232,7 +235,7 @@ get_data <- function(token_df, res, mod.type, save_dir, merge_Tiles, save_tile){
   if (isTRUE(merge_Tiles)){
     ras.obj <- merge_ostiles(dest_path)
     if (isTRUE(save_tile)){
-      ras.obj <- raster::writeRaster(ras.obj, file.path(dest_folder, os_tile_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW"))
+      suppressWarnings(ras.obj <- raster::writeRaster(ras.obj, file.path(dest_folder, os_tile_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW")))
       unlink(dest_path, recursive = TRUE, force=TRUE)
     }
 
@@ -282,7 +285,7 @@ get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_t
     create_zip_tiles(., temp_shp_dir) %>%
     split(., ceiling(seq_along(.)/10))
 
-
+  message('Scraping web portal tile tokens...')
   arc_tokens <- zip_shp_list %>%
     purrr::map(., ~ start_selenium(zipped_shps = ., chrome_v = chrome_ver))
 
@@ -291,6 +294,19 @@ get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_t
     dplyr::bind_cols(tibble::as_tibble(unlist(purrr::map(arc_tokens, ~unlist(.))))) %>%
     dplyr::rename(arc_tokens = value)
 
+  # set up progress bar for download
+  pb <- progress::progress_bar$new(total = length(tile_list5km), clear = FALSE)
+
+  # function to control download safely - logging errors
+  collect_data_safe <- function(x) {
+    pb$tick()
+    f = purrr::safely(function() get_data(token_df = x, res=resolution, mod.type=mod_type, save_dir=temp_ras_dir,
+                                          merge_Tiles = merge_tiles, save_tile = save.tile ))
+    f()
+  }
+
+  # prep dataframe and map tile download function
+  message('Downloading tiles...')
   rasters <- tibble::as_tibble(tile_list5km) %>%
     dplyr::rename(grid_name_5km = value) %>%
     dplyr::mutate(grid_name10km = substr(grid_name_5km,1,4)) %>%
@@ -298,7 +314,7 @@ get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_t
     dplyr::mutate(id = dplyr::row_number()) %>%
     dplyr::group_by(id) %>%
     dplyr::group_split() %>%
-    purrr::map(., ~ get_data(., res=resolution, mod.type=mod_type, save_dir=temp_ras_dir, merge_Tiles = merge_tiles, save_tile = save.tile ))
+    purrr::map(., ~ collect_data_safe(.))
 
   return(rasters)
 
