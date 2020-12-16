@@ -1,38 +1,34 @@
+# Notes: Starting to come together nicely. some stuff to do
+
+# Add functionality for downloading specific products.
+#    i. by year - allowing for download of specific time-series data.
+#    ii. by composite - to select only composite dataset
+#    iii. by NLP - select only data from the NLP
+#    iv. by timeseries - select all lidar for a given area for all years and generate a raster stack.
+
+
+# Update check coverage function:
+# I think we need to move away from ggplot - it's just too slow. let's make a simple base plot.
+# Need to consider options for coverage data - it's massive - maybe compressing will solve this...
+# maybe we should just direct people to either the DEFRA or EA portal to check (not super keen on
+# this but loading time at present for the package is way too long.)
+
+
+# Add alternative download functions:
+#   i. get_tile - download specific tile by name
+#   ii. get_area_from_xy - download area buffered around a given x y location.
+
+# consider adding parallel functionality for scraping - will improve speed but make error handling trickier?
+
+
+
+
+
+
 devtools::load_all()
 devtools::document()
 library(sf)
-grid5_int <- c("SK08ne", "SK08se", "SK09se", "SK18nw", "SK18sw", "SK19sw")
 
-grid10_int <- c("SK08", "SK09", "SK18", "SK19")
-#
-
-
-grid5_int <- c("SK08ne")
-
-grid10_int <- c("SK08")
-
-
-grid5_int <- c("ST10ne")
-
-grid10_int <- c("ST10")
-
-
-grid5_int <- c("SU01ne", "SU01se", "SU01nw")
-
-grid10_int <- c("SU01")
-
-
-st <- Sys.time()
-l <- get_tiles(tile_list10km = grid10_int, tile_list5km = grid5_int, chrome_ver="87.0.4280.88", resolution=1, mod_type='DSM')
-print(Sys.time()-st)
-
-
-night_skyT <- function(n=255){
-
-  pal <-colorRampPalette(c('#33366A', '#7478AB','#95DAFC', '#FDA3DA', '#FFDA5C', '#FFF6DC'))
-
-  return(pal(n))
-}
 
 
 st <- Sys.time()
