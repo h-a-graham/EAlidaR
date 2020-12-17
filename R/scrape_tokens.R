@@ -146,6 +146,10 @@ merge_ostiles <- function(ras.folder){
 
   ras.list <- list.files(ras.folder)
 
+  if (dir.exists(file.path(ras.folder,'index'))){
+    ras.list <- ras.list[ras.list != 'index']
+  }
+
   if (dir.exists(file.path(ras.folder,ras.list[1]))){
     ras.folder <- file.path(ras.folder,ras.list)
     ras.list <- list.files(ras.folder)
