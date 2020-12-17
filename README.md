@@ -80,14 +80,15 @@ the active R session (unless subsequently saved with
 
 </p>
 
-Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_5km()` 
+Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_10km()` 
 allow the users to specify 5 or 10m OS tile name(s) as a vector:
 
     NY20nw <- get_OS_tile_5km(os_tile_name = 'NY20nw', resolution = 1, model_type = 'DTM')
 
     NY20 <- get_OS_tile_10km(os_tile_name = 'NY20', resolution = 1, model_type = 'DTM')
 
-And the a final option to download data is with `get_from_xy()`:
+And the a final option to download data is with `get_from_xy()`. For now the XY coordinates must
+be provided in OSGB/British National Grid format:
 
     Scafell_Peak <- get_from_xy(xy=c(321555, 507208), radius = 500, resolution = 1, model_type = 'DSM')
 

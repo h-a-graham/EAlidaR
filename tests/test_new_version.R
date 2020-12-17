@@ -63,7 +63,7 @@ raster::plot(NY20nw, col=sun_rise(),)
 
 ?get_OS_tile_5km
 
-NY <- get_OS_tile_10km(OS_5km_tile= c('NY'), resolution = 1, model_type = 'DSM')
+NY <- get_OS_tile_10km(OS_10km_tile= c('NY20'), resolution = 1, model_type = 'DSM')
 raster::plot(NY20nw, col=sun_rise())
 
 # testing get_from_xy
