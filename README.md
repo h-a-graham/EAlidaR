@@ -43,18 +43,24 @@ if available before searching composite data. If 0.25, 0.5 or 1m
 resolution is chosen, Composite data will be requested. I intend to add
 support for the time series data in the near future.
 
+
 ### Installation
 
 `devtools::install_github('h-a-graham/EAlidaR')`
+
+### Checking for available data
+
+You can check the availability of data for your region by using
+`check_coverage` which returns a ggplot of the available coverage. To
+see national scale coverage use `national_covaerage`. However, at present
+these functions only display the Composite data, and don't include NLP 
+extents. For more information on data coverage see this [web portal](https://environment.maps.arcgis.com/apps/webappviewer/index.html?id=f765c2a97d644f08927d5cd5abe58d87)
 
 ### Examples:
 
 Here is a simple use case where we download the available 2m DTM data
 for one of the example regions provided with the package `Ashop_sf`.
-First, you can check the availability of data for your region by using
-`check_coverage` which returns a ggplot of the available coverage (To
-see national scale coverage use `national_covaerage`). Then, using the
-`get_area` function we retrieve a single raster as ‘merge_tiles’ is
+Using the `get_area` function, we retrieve a single raster as ‘merge_tiles’ is
 TRUE. We can save this data in a desired location with ‘dest_folder’,
 ‘out_name’ and ‘ras_format’ arguments but, in this case, rasters are
 stored in the `tempfile()` location and will be available only during
