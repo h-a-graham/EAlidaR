@@ -4,7 +4,7 @@ is_absolute_path <- function(path) {
 
 
 resave_rasters <- function(ras, folder, ras_format){
-  save_name <- tools::file_path_sans_ext(basename(ras@file@name))
+  save_name <- ras@title
   out_ras <- suppressWarnings(raster::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW")))
   return(out_ras)
 }
@@ -250,3 +250,42 @@ get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_versio
 
   return(out_ras)
 }
+
+
+#' Get DTM or DSM data from an X Y location
+#'
+#' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
+#' It retrieves all available data within the requested area defined by 'xy' and 'radius' arguments and offers some additional functionality to
+#' merge and crop the raster if desired. This function uses the get_tile function to extract all tiles that intersect the
+#' desired region.
+#'
+#' @param xy A vector of length 2 with XY coordinates using OSGB/British National (EPSG:27700). e.g. c(321555, 507208)
+#' @param radius The radius (in meters) of the buffer to be used to define the limits of the downloaded data
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. <1m data has generally low coverage.
+#' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param chrome_version The chrome version that best matches your own chrome installation version. Choose from binman::list_versions("chromedriver")
+#' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
+#' @param crop Boolean with default FALSE. If TRUE data outside the bounds of the requested polygon area are discarded.
+#' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
+#' @param out_name Character required when saving merged raster to dest.folder.
+#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @export
+get_from_xy <- function(xy, radius, resolution, model_type, chrome_version = NULL, merge_tiles=TRUE, crop=TRUE, dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+
+  point <- sf::st_point(xy)
+
+  d <- data.frame(id = 1)
+  d$geom <- sf::st_sfc(point)
+  req_area <- sf::st_as_sf(d, crs = 27700, agr = "constant") %>%
+    sf::st_buffer(., radius)
+
+  out_ras <- get_area(poly_area=req_area, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
+                      merge_tiles=merge_tiles, crop=crop, dest_folder=NULL, out_name=NULL, ras_format="GTiff")
+
+  return(out_ras)
+
+
+}
+
+

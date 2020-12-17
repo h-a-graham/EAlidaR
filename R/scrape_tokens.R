@@ -234,6 +234,8 @@ get_data <- function(token_df, res, mod.type, save_dir){
 
   ras.obj <- merge_ostiles(dest_path)
 
+  ras.obj@title <- os.tile
+
   return(ras.obj)
 
 
