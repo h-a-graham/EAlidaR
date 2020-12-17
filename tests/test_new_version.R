@@ -24,7 +24,7 @@ library(sf)
 
 
 st <- Sys.time()
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=FALSE, crop=FALSE,
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE,
                       dest_folder = 'tests/save_tests', out_name = 'Ashop_DSM_2m')
 print(Sys.time()-st)
 raster::plot(Ashop_Ras, col=sun_rise())
