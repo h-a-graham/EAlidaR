@@ -5,7 +5,7 @@ is_absolute_path <- function(path) {
 
 resave_rasters <- function(ras, folder, ras_format){
   save_name <- tools::file_path_sans_ext(basename(ras@file@name))
-  out_ras <- raster::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW"))
+  out_ras <- suppressWarnings(raster::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW")))
   return(out_ras)
 }
 
@@ -32,13 +32,17 @@ missing_tiles_warn <- function(mod_type, res, tile_str){
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_area <- function(poly_area, resolution, model_type, chrome_version, merge_tiles, crop, dest_folder, out_name, ras_format){
+get_area <- function(poly_area, resolution, model_type, chrome_version = NULL, merge_tiles=TRUE, crop=FALSE, dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
 
-  if (isFALSE(merge_tiles) && !missing(dest_folder) && !missing(out_name)){
+  if (is.null(chrome_version)){
+    chrome_version = find_chrome_v()
+  }
+
+  if (isFALSE(merge_tiles) && !is.null(dest_folder) && !is.null(out_name)){
     message('"out.name" ignored when saving multiple rasters i.e when "merge.type" = FALSE\n')
   }
 
-  if (isTRUE(merge_tiles) && !missing(dest_folder) && missing(out_name)){
+  if (isTRUE(merge_tiles) && !is.null(dest_folder) && is.null(out_name)){
 
     stop('When saving a merged raster (merged.tiles = TRUE) you must also provide a name (i.e out.name = "MyArea")')
   }
@@ -65,7 +69,7 @@ get_area <- function(poly_area, resolution, model_type, chrome_version, merge_ti
   }
 
 
-  if (missing(dest_folder)) {
+  if (is.null(dest_folder)) {
     save.tile <- FALSE
     dest_folder <- tempdir()
     message('No destination folder provided - saving to temp directory..\n')
@@ -78,22 +82,12 @@ get_area <- function(poly_area, resolution, model_type, chrome_version, merge_ti
 
   }
 
-  if (missing(merge_tiles)){
-    merge_tiles <- TRUE
-  }
-
-  if (missing(crop)){
-    crop <- FALSE
-  }
 
   if (isTRUE(crop) & isFALSE(merge_tiles)){
     crop==FALSE
     message(' "crop" arg. ignored - crop only applies when "merge.tiles" is TRUE \n')
   }
 
-  if (missing(ras_format)){
-    ras_format <- "GTiff"
-  }
 
   rasformats <- raster::writeFormats()[,1]
   if (!(ras_format %in% rasformats)){
@@ -144,7 +138,7 @@ get_area <- function(poly_area, resolution, model_type, chrome_version, merge_ti
   if (isTRUE(merge_tiles)){
     if (length(ras_list) > 1){
       message('Merging Rasters...')
-      ras_merge <- do.call(raster::merge, ras_list)
+      ras_merge <- suppressWarnings(do.call(raster::merge, ras_list))
     } else if(length(ras_list) == 1){
 
       ras_merge <- ras_list[[1]]
@@ -153,12 +147,12 @@ get_area <- function(poly_area, resolution, model_type, chrome_version, merge_ti
 
     if (isTRUE(crop)){
       message('Cropping Raster...')
-      ras_merge <- raster::crop(ras_merge, sf_geom)
+      ras_merge <- suppressWarnings(raster::crop(ras_merge, sf_geom))
     }
 
     if (isTRUE(save.tile)){
-      ras_merge <- raster::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
-                                       overwrite=TRUE, options = c("COMPRESS=LZW"))
+      ras_merge <- suppressWarnings(raster::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
+                                       overwrite=TRUE, options = c("COMPRESS=LZW")))
     }
     if (isTRUE(errs_flagged)){
       missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
@@ -192,3 +186,67 @@ get_area <- function(poly_area, resolution, model_type, chrome_version, merge_ti
   return(ras_list)
 }
 
+#' Get DTM or DSM data for a given 5km Ordnance Survey (OS) tile name(s)
+#'
+#' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
+#' It retrieves all available data within the requested area defined by OS_5km_tile and offers some additional functionality to
+#' merge and crop the raster if desired. This function uses the get_area function to extract all requested tiles.
+#'
+#' @param OS_5km_tile A vector of type character containing the names of the desired 5km Tiles. e.g. 'NY20nw' or c('NY20nw','NY20ne').
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. <1m data has generally low coverage.
+#' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param chrome_version The chrome version that best matches your own chrome installation version. Choose from binman::list_versions("chromedriver")
+#' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
+#' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
+#' @param out_name Character required when saving merged raster to dest.folder.
+#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @export
+get_OS_tile_5km <- function(OS_5km_tile, resolution, model_type, chrome_version=NULL, merge_tiles=TRUE,
+                            dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+
+  OS_tile_name <- toupper(OS_5km_tile)
+
+  tile_sf <- grid_5km_sf %>%
+    dplyr::filter(TILE_NAME %in% OS_tile_name) %>%
+    dplyr::summarise()%>%
+    sf::st_buffer(-1)
+
+  out_ras <- get_area(poly_area=tile_sf, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
+                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=NULL, out_name=NULL, ras_format="GTiff")
+
+  return(out_ras)
+}
+
+
+#' Get DTM or DSM data for a given 10km Ordnance Survey (OS) tile name(s)
+#'
+#' This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.
+#' It retrieves all available data within the requested area defined by OS_10km_tile and offers some additional functionality to
+#' merge and crop the raster if desired. This function uses the get_area function to extract all requested tiles.
+#'
+#' @param OS_10km_tile A vector of type character containing the names of the desired 5km Tiles. e.g. 'NY20' or c('NY20','NY20').
+#' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2. <1m data has generally low coverage.
+#' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
+#' @param chrome_version The chrome version that best matches your own chrome installation version. Choose from binman::list_versions("chromedriver")
+#' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
+#' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
+#' @param out_name Character required when saving merged raster to dest.folder.
+#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @export
+get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_version=NULL, merge_tiles=TRUE,
+                            dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+
+  OS_tile_name <- toupper(OS_10km_tile)
+
+  tile_sf <- grid_10km_sf %>%
+    dplyr::filter(TILE_NAME %in% OS_tile_name) %>%
+    dplyr::summarise()%>%
+    sf::st_buffer(-1)
+
+  out_ras <- get_area(poly_area=tile_sf, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
+                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=NULL, out_name=NULL, ras_format="GTiff")
+
+  return(out_ras)
+}

@@ -49,7 +49,7 @@ scrape_token <- function(tile, chrome.version, remDr) {
   prodsIndex <- which(prodList %in% desiredProds)
 
   if (length(prodsIndex) == 0){
-    message("No Data available for this tile...")
+    message(sprintf("No Data available for: %s", stringr::str_sub(basename(tile),1, -5)))
     arc_id <- 'NO_DATA'
   } else {
 
@@ -94,7 +94,7 @@ start_selenium <- function(zipped_shps, chrome_v){
   driver <- rD[["client"]]
 
   # set an implicit timeout of 20s
-  timeouts(driver, 20000)
+  timeouts(driver, 30000)
 
   driver$navigate("https://environment.data.gov.uk/DefraDataDownload/?Mode=survey")
 
@@ -170,7 +170,7 @@ merge_ostiles <- function(ras.folder){
   return(ras.merge)
 }
 
-get_data <- function(token_df, res, mod.type, save_dir, merge_Tiles, save_tile){
+get_data <- function(token_df, res, mod.type, save_dir){
 
   arc_web_id <- token_df$arc_tokens[1]
   os.tile <- token_df$grid_name_5km[1]
@@ -232,51 +232,19 @@ get_data <- function(token_df, res, mod.type, save_dir, merge_Tiles, save_tile){
 
   dest_path <- (unzip_files(tile_data))
 
-  if (isTRUE(merge_Tiles)){
-    ras.obj <- merge_ostiles(dest_path)
-    if (isTRUE(save_tile)){
-      suppressWarnings(ras.obj <- raster::writeRaster(ras.obj, file.path(dest_folder, os_tile_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW")))
-      unlink(dest_path, recursive = TRUE, force=TRUE)
-    }
+  ras.obj <- merge_ostiles(dest_path)
 
-    return(ras.obj)
-  }
+  return(ras.obj)
 
-  options(warn = oldw)
-  return(dest_path)
 
 }
 
 
 
-get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_type, merge_tiles, dest_folder, ras_format){
+get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_type, merge_tiles = TRUE, ras_format = "GTiff"){
 
-  if(!(mod_type == 'DTM' || mod_type == 'DSM')){
-    stop('Only DTM and DSM model types are supported at present.')
-  }
 
-  if (missing(dest_folder)) {
-    dest_folder <- tempdir()
-    save.tile <- FALSE
-  } else {
-    save.tile <- TRUE
-    if (isFALSE(is_absolute_path(dest_folder))){
-      dest_folder <- normalizePath(file.path(dest_folder))
-    }
-  }
-
-  if (missing(merge_tiles)){
-    merge_tiles <- TRUE
-  }
-
-  if (missing(ras_format)){
-    ras_format <- "GTiff"
-  }
-
-  rasformats <- raster::writeFormats()[,1]
-  if (!(ras_format %in% rasformats)){
-    stop('Requested Raster format not supported. Use raster::writeFormats() to view supported drivers')
-  }
+  dest_folder <- tempdir()
 
   temp_shp_dir <- tempdir()
   temp_ras_dir <- tempdir()
@@ -299,9 +267,8 @@ get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_t
 
   # function to control download safely - logging errors
   collect_data_safe <- function(x) {
+    f = purrr::safely(function() get_data(token_df = x, res=resolution, mod.type=mod_type, save_dir=temp_ras_dir))
     pb$tick()
-    f = purrr::safely(function() get_data(token_df = x, res=resolution, mod.type=mod_type, save_dir=temp_ras_dir,
-                                          merge_Tiles = merge_tiles, save_tile = save.tile ))
     f()
   }
 
