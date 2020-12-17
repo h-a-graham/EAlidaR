@@ -1,18 +1,19 @@
 
 # EAlidaR
 
-<div style="text-align:center"><img src="/man/figures/ScarfellHQ.png" width="60%"></div>
+<p align="center">
+<img src="/man/figures/ScarfellHQ.png" width="60%">
+</p>
 
 **After a brief hiatus, {EAlidar} is back and now (theoretically) able
 to handle the dynamic URL download requests of the DEFRA portal. No
 doubt problems will crop up so please start up a
 [discussion](https://github.com/h-a-graham/EAlidaR/discussions) or
-[submit and issue](https://github.com/h-a-graham/EAlidaR/issues)**
+[submit an issue](https://github.com/h-a-graham/EAlidaR/issues)**
 
-An R package to download EA LiDAR composite data for England. So you’re
-aware, Data downloaded with this package is licensed under the [Open
-Government License
-v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
+An R package to download EA LiDAR 'National LiDAR programme' (NLP) and 
+composite data for England. So you’re aware, Data downloaded with this 
+package is licensed under the [Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
 
 ### Background:
 
@@ -56,6 +57,15 @@ see national scale coverage use `national_covaerage`. However, at present
 these functions only display the Composite data, and don't include NLP 
 extents. For more information on data coverage see this [web portal](https://environment.maps.arcgis.com/apps/webappviewer/index.html?id=f765c2a97d644f08927d5cd5abe58d87)
 
+### A note on the the Chrome driver...
+
+Looks like the first time you call one of the below functions to request liDAR it
+may be necessary to specify the Chrome version as the automated detection may not
+work. To do this simply open chrome > menu button > help > About Google Chrome. 
+Then copy the version number and include it as a character string in the 'chrome_version'
+argument.
+
+
 ### Examples:
 
 Here is a simple use case where we download the available 2m DTM data
@@ -89,7 +99,7 @@ the active R session (unless subsequently saved with
 Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_10km()` 
 allow the users to specify 5 or 10m OS tile name(s) as a vector:
 
-    NY20nw <- get_OS_tile_5km(os_tile_name = 'NY20nw', resolution = 1, model_type = 'DTM')
+    NY20nw <- get_OS_tile_5km(os_tile_name = c('NY20nw','NY10ne)', resolution = 1, model_type = 'DTM')
 
     NY20 <- get_OS_tile_10km(os_tile_name = 'NY20', resolution = 1, model_type = 'DTM')
 
