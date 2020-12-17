@@ -20,7 +20,6 @@ Imports:
   tools,
   zip,
   tibble,
-  forcats,
   ggplot2,
   purrr,
   stringr,

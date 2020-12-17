@@ -1,7 +1,7 @@
 
 # EAlidaR
 
-<img src="/man/figures/ScarfellHQ.png" width="70%">
+<div style="text-align:center"><img src="/man/figures/ScarfellHQ.png" width="60%"></div>
 
 **After a brief hiatus, {EAlidar} is back and now (theoretically) able
 to handle the dynamic URL download requests of the DEFRA portal. No
@@ -27,7 +27,7 @@ in zipped files of varying raster formats (mainly ASCII and GeoTiff).
 The purpose of this package is to provide a clean and easy way to
 download and interact directly with these excellent data in R. The
 challange here is that the download URLs for LiDAR tiles are not static.
-This package uses the [{RSelenium} package](https://github.com/ropensci/RSelenium) to automate the
+This package uses [{RSelenium}](https://github.com/ropensci/RSelenium) to automate the
 uploading of Ordnance Survey tiles that intersect a requested area. At
 present, {EAlidar} only supports the chrome driver; you will
 therefore need to have Google Chrome installed on your machine to run
@@ -54,9 +54,9 @@ for one of the example regions provided with the package `Ashop_sf`.
 First, you can check the availability of data for your region by using
 `check_coverage` which returns a ggplot of the available coverage (To
 see national scale coverage use `national_covaerage`). Then, using the
-`get_area` function we retrieve a single raster as ‘merge\_tiles’ is
-TRUE. We can save this data in a desired location with ‘dest\_folder’,
-‘out\_name’ and ‘ras\_format’ arguments but, in this case, rasters are
+`get_area` function we retrieve a single raster as ‘merge_tiles’ is
+TRUE. We can save this data in a desired location with ‘dest_folder’,
+‘out_name’ and ‘ras_format’ arguments but, in this case, rasters are
 stored in the `tempfile()` location and will be available only during
 the active R session (unless subsequently saved with
 `raster::writeRaster`).
@@ -67,7 +67,8 @@ the active R session (unless subsequently saved with
     # national_coverage(model_type = 'DSM', resolution = 2) # quite slow by the way...
     check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 2)
     
-    Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE)
+    Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', 
+                          merge_tiles=TRUE, crop=TRUE)
     
     raster::plot(Ashop_Ras, col=sun_rise())
     plot(Ashop_sf, add = TRUE)
@@ -79,20 +80,20 @@ the active R session (unless subsequently saved with
 
 </p>
 
-Alternatively, the function `get_tile` downloads data from a single 5km
-OS tile. Make sure the case is correct in ‘os\_tile\_name’ with the
-first two characters in caps and last two in lower case. ‘dest\_folder’
-can be supplied to save the raster(s) in a specified location, otherwise
-it will be written to tempfile(). ‘ras\_format’ can be used to specify
-the raster driver used see `raster::writeFormats()` for options -
-default is GeoTiff.
+Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_5km()` 
+allow the users to specify 5 or 10m OS tile name(s) as a vector:
 
-    rasTile <- get_tile(os_tile_name = 'SU66nw', resolution = 2, model_type = 'DTM')
+    NY20nw <- get_OS_tile_5km(os_tile_name = 'NY20nw', resolution = 1, model_type = 'DTM')
+
+    NY20 <- get_OS_tile_10km(os_tile_name = 'NY20', resolution = 1, model_type = 'DTM')
+
+And the a final option to download data is with `get_from_xy()`:
+
+    Scafell_Peak <- get_from_xy(xy=c(321555, 507208), radius = 500, resolution = 1, model_type = 'DSM')
 
 And just to really show off how great this data is, here are some 3D
-examples with the brilliant rayshader package (more info at:
-<https://github.com/tylermorganwall/rayshader>). First let’s try out the
-Ashop Valley data we downloaded previously. Note that multicore is set
+examples with the brilliant [{rayshader} package](https://github.com/tylermorganwall/rayshader). 
+First let’s try out the Ashop Valley data we downloaded previously. Note that multicore is set
 to TRUE, in these examples, as they are quite large rasters - set to
 FALSE if you don’t want to use multiprocessing.
 

@@ -58,12 +58,12 @@ plot(UniOfExeter_sf,
 # testing get_OS_tile_5km
 
 NY20nw <- get_OS_tile_5km(OS_5km_tile= c('NY20nw'), resolution = 1, model_type = 'DSM')
-raster::plot(NY20nw, col=sun_rise())
+raster::plot(NY20nw, col=sun_rise(),)
 
 
 ?get_OS_tile_5km
 
-NY20nw <- get_OS_tile_5km(OS_5km_tile= c('NY20nw'), resolution = 1, model_type = 'DSM')
+NY <- get_OS_tile_10km(OS_5km_tile= c('NY'), resolution = 1, model_type = 'DSM')
 raster::plot(NY20nw, col=sun_rise())
 
 # testing get_from_xy
@@ -89,3 +89,14 @@ ScarMat %>%
 Sys.sleep(0.2)
 render_depth(focus = 0.6, focallength = 60, clear = FALSE, filename = 'man/figures/Scarfell.png')
 render_highquality(filename = 'man/figures/ScarfellHQ.png')
+
+
+
+# coverage tests
+
+check_coverage(Ashop_sf, 'DSM', 2)
+
+national_coverage('DSM', 1)
+
+
+
