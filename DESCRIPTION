@@ -20,11 +20,11 @@ Imports:
   tools,
   zip,
   tibble,
-  forcats,
   ggplot2,
   purrr,
   stringr,
   progress,
-  ggspatial
+  ggspatial,
+  RSelenium
 Depends: 
     R (>= 2.10)

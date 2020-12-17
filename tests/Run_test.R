@@ -22,27 +22,15 @@ save_folder2 <- 'tests/save_tests'
 
 # area_withfail <- read_sf(system.file("extdata", "Test_Area3.gpkg", package = "EAlidaR"))
 
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE,
-                      dest_folder = save_folder2, out_name = 'test1') #, dest.folder = save_folder, out.name = 'TESTAREA'
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
+                      # dest_folder = save_folder2, out_name = 'test1') #, dest.folder = save_folder, out.name = 'TESTAREA'
 
 
-
-
-ggplot() +
-  # loads background map tiles from a tile source - rosm::osm.types() for osm options
-  annotation_map_tile(type = "osm", zoomin = -1) +
-  # requested area
-  annotation_spatial(Ashop_sf, size = 2, col = "black", fill = NA) +
-  # raster layer
-  layer_spatial(Ashop_Ras, alpha = 0.8) +
-  # make no data values transparent
-  scale_fill_distiller(na.value = NA, name='Elevation (m)') +
-  # get real coords
-  coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
-  theme_bw()
-
-ggsave(filename = 'man/figures/AshopMap.png', dpi = 600)
-
+png(filename='man/figures/AshopMap.png')
+raster::plot(Ashop_Ras, col=night_sky())
+plot(Ashop_sf,
+     add = TRUE)
+dev.off()
 
 # --------- Test Tile download -------------------------
 

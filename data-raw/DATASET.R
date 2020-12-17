@@ -54,4 +54,13 @@ ggplot(city_of_london_sf) +
 usethis::use_data(city_of_london_sf, overwrite = TRUE)
 
 
+# Code to generate 5km and 10km grids from shp files
+
+grid_5km_shp <- system.file("data-raw/OSGB_Grids-master/OSGB_Grids-master/Shapefile", "OSGB_Grid_5km.shp", package = "EAlidaR")
+grid_5km_sf <- sf::read_sf(grid_5km_shp)
+
+grid_10km_shp <- system.file("data-raw/OSGB_Grids-master/OSGB_Grids-master/Shapefile", "OSGB_Grid_10km.shp", package = "EAlidaR")
+grid_10km_sf <- sf::read_sf(grid_10km_shp)
+
+usethis::use_data(grid_5km_sf, grid_10km_sf, internal = TRUE, overwrite = TRUE)
 
