@@ -40,7 +40,7 @@ model_res_check <- function(.model, .res){
 #' @param poly_area Either an sf object or an sf-readable file. See sf::st_drivers() for available drivers
 #' @param model_type A character of either 'DTM' or 'DSM' referring to Digital Terrain Model and Digital Surface Model respectively.
 #' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
-#' @return A ggplot object - map of coverage requested and subtitle detailing % cover.
+#' @return A ggplot object - map of coverage requested and subtitle detailing proportion of cover.
 #' @export
 check_coverage <- function(poly_area, model_type, resolution){
   oldw <- getOption("warn")
@@ -56,14 +56,16 @@ check_coverage <- function(poly_area, model_type, resolution){
     sf_geom <- sf::read_sf(poly_area)
   }
 
-  #check and transform CRS of in polygon
-  in_poly_crs <- sf::st_crs(sf_geom)$epsg
-  if (in_poly_crs != 27700){
-    message(sprintf('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\
-         Polygon will be transformed from EPSG:%s to EPSG:27700', in_poly_crs))
-    sf_geom <- sf_geom %>%
-      sf::st_transform(27700)
+  #transform and check CRS of in polygon #  possible solution to %epsg returning 'NA'
+  in_poly_crs <- sf::st_crs(sf_geom)
 
+  sf_geom <- sf_geom %>%
+    sf::st_transform(27700)
+
+  if (in_poly_crs != sf::st_crs(sf_geom)){
+    message('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\
+         Polygon will be transformed to EPSG:27700 \
+         Rasters will be returned in EPSG:27700\n')
   }
 
   cover_int <- sf::st_intersection(cover_sf, sf_geom) %>%

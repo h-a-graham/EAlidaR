@@ -57,15 +57,16 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL, m
     sf_geom <- sf::read_sf(poly_area)
   }
 
-  #check and transform CRS of in polygon
-  in_poly_crs <- sf::st_crs(sf_geom)$epsg
-  if (in_poly_crs != 27700){
-    message(sprintf('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\
-         Polygon will be transformed from EPSG:%s to EPSG:27700 \
-         Rasters will be returned in the original CRS - EPSG:27700\n', in_poly_crs))
-    sf_geom <- sf_geom %>%
-      sf::st_transform(27700)
+  #transform and check CRS of in polygon #  possible solution to %epsg returning 'NA'
+  in_poly_crs <- sf::st_crs(sf_geom)
 
+  sf_geom <- sf_geom %>%
+    sf::st_transform(27700)
+
+  if (in_poly_crs != sf::st_crs(sf_geom)){
+    message('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\
+         Polygon will be transformed to EPSG:27700 \
+         Rasters will be returned in EPSG:27700\n')
   }
 
 

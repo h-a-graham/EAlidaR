@@ -35,3 +35,15 @@ sun_rise <- function(n=255){
 
   return(pal(n))
 }
+
+#' A function to generate the fireburst colour map.
+#'
+#' @param n integer value specifying the number of breaks to be used for the colour palette
+#' @return A colour ramp to make sexy raster maps
+#'@export
+fireburst <- function(n=255){
+
+  pal <-colorRampPalette(c('#353652', '#9898B9', '#E7F7FF', '#F3AC4A', '#F3734A', '#66EAFF'))
+
+  return(pal(n))
+}

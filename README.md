@@ -32,15 +32,14 @@ This package uses [{RSelenium}](https://github.com/ropensci/RSelenium) to automa
 uploading of Ordnance Survey tiles that intersect a requested area. At
 present, {EAlidar} only supports the chrome driver; you will
 therefore need to have Google Chrome installed on your machine to run
-this package. The Chrome driver should be automatically detected the correct version; 
-the automated version detection for Linux has not
-been tested - if this fails, the user can provide the correct version as
+this package. The Chrome driver version should be automatically detected (not tested on ios); 
+if this fails, the user can provide the correct version as
 an argument.
 
 Right now, this package only supports the most recent LiDAR data
 available. This includes the National LiDAR Programme (NLP) and
 Composite data. If 1m resolution is chosen, NLP data will be requested
-if available before searching composite data. If 0.25, 0.5 or 1m
+if available before searching composite data. If 0.25, 0.5 or 2m
 resolution is chosen, Composite data will be requested. I intend to add
 support for the time series data in the near future.
 
@@ -59,7 +58,7 @@ extents. For more information on data coverage see this [web portal](https://env
 
 ### A note on the the Chrome driver...
 
-Looks like the first time you call one of the below functions to request liDAR it
+Looks like the first time you call one of the below functions to request liDAR data it
 may be necessary to specify the Chrome version as the automated detection may not
 work. To do this simply open chrome > menu button > help > About Google Chrome. 
 Then copy the version number and include it as a character string in the 'chrome_version'
