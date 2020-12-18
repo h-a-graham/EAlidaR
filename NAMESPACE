@@ -2,6 +2,7 @@
 
 export("%>%")
 export(check_coverage)
+export(fireburst)
 export(get_OS_tile_10km)
 export(get_OS_tile_5km)
 export(get_area)
