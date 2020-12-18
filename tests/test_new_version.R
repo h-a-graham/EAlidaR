@@ -46,11 +46,13 @@ raster::plot(Scafel_ras, col=night_sky())
 plot(Scafell_sf,
      add = TRUE)
 
+UoEtrans <- sf::st_transform(UniOfExeter_sf, 4326)
+
 st <- Sys.time()
-ExeUniRas <-  get_area(poly_area = UniOfExeter_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
+ExeUniRas <-  get_area(poly_area = UoEtrans, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
 print(Sys.time()-st)
 
-raster::plot(ExeUniRas, col=night_sky())
+raster::plot(ExeUniRas, col=sun_rise())
 plot(UniOfExeter_sf,
      add = TRUE)
 
@@ -98,5 +100,11 @@ check_coverage(Ashop_sf, 'DSM', 2)
 
 national_coverage('DSM', 1)
 
+#crs issue:
 
+sf::st_crs(UniOfExeter_sf) == sf::st_crs(sf::st_transform(UniOfExeter_sf, 27700))
+
+UoEwgs <- sf::st_transform(UniOfExeter_sf, 4326)
+
+sf::st_crs(UoEwgs) == sf::st_crs(sf::st_transform(UoEwgs, 27700))
 

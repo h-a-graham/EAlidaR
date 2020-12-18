@@ -14,7 +14,7 @@ check_coverage(poly_area, model_type, resolution)
 \item{resolution}{a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.}
 }
 \value{
-A ggplot object - map of coverage requested and subtitle detailing % cover.
+A ggplot object - map of coverage requested and subtitle detailing proportion of cover.
 }
 \description{
 This function checks the amount of coverage offered by the LiDAR mosaic of a given resolution for an area of interest
