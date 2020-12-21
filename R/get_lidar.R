@@ -214,7 +214,7 @@ get_OS_tile_5km <- function(OS_5km_tile, resolution, model_type, chrome_version=
     sf::st_buffer(-1)
 
   out_ras <- get_area(poly_area=tile_sf, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
-                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=NULL, out_name=NULL, ras_format="GTiff")
+                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format)
 
   return(out_ras)
 }
@@ -247,7 +247,7 @@ get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_versio
     sf::st_buffer(-1)
 
   out_ras <- get_area(poly_area=tile_sf, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
-                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=NULL, out_name=NULL, ras_format="GTiff")
+                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format)
 
   return(out_ras)
 }
@@ -272,7 +272,8 @@ get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_versio
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_from_xy <- function(xy, radius, resolution, model_type, chrome_version = NULL, merge_tiles=TRUE, crop=TRUE, dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+get_from_xy <- function(xy, radius, resolution, model_type, chrome_version = NULL,
+                        merge_tiles=TRUE, crop=TRUE, dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
 
   point <- sf::st_point(xy)
 
@@ -282,7 +283,7 @@ get_from_xy <- function(xy, radius, resolution, model_type, chrome_version = NUL
     sf::st_buffer(., radius)
 
   out_ras <- get_area(poly_area=req_area, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
-                      merge_tiles=merge_tiles, crop=crop, dest_folder=NULL, out_name=NULL, ras_format="GTiff")
+                      merge_tiles=merge_tiles, crop=crop, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format)
 
   return(out_ras)
 
