@@ -62,7 +62,7 @@ Looks like the first time you call one of the below functions to request liDAR d
 may be necessary to specify the Chrome version as the automated detection may not
 work. To do this simply open chrome > menu button > help > About Google Chrome. 
 Then copy the version number and include it as a character string in the 'chrome_version'
-argument.
+argument. Some issues still remain for OSX and MacOS...
 
 
 ### Examples:
@@ -98,9 +98,9 @@ the active R session (unless subsequently saved with
 Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_10km()` 
 allow the users to specify 5 or 10m OS tile name(s) as a vector:
 
-    NY20nw <- get_OS_tile_5km(os_tile_name = c('NY20nw','NY10ne)', resolution = 1, model_type = 'DTM')
+    NY20nw <- get_OS_tile_5km(OS_5km_tile = c('NY20nw','NY10ne)', resolution = 1, model_type = 'DTM')
 
-    NY20 <- get_OS_tile_10km(os_tile_name = 'NY20', resolution = 1, model_type = 'DTM')
+    NY20 <- get_OS_tile_10km(OS_10km_tile = 'NY20', resolution = 1, model_type = 'DTM')
 
 And the a final option to download data is with `get_from_xy()`. For now the XY coordinates must
 be provided in OSGB/British National Grid format:

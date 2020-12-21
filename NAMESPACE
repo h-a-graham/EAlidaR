@@ -2,6 +2,7 @@
 
 export("%>%")
 export(check_coverage)
+export(find_chrome_v)
 export(fireburst)
 export(get_OS_tile_10km)
 export(get_OS_tile_5km)
