@@ -103,6 +103,7 @@ start_selenium <- function(zipped_shps, chrome_v){
     purrr::map(., ~scrape_token(tile = ., chrome.version = chrome_v, remDr = driver))
 
   driver$close()
+  rD$server$stop()
 
   return(tokens)
 
