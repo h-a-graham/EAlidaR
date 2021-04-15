@@ -24,7 +24,7 @@ library(sf)
 
 
 st <- Sys.time()
-Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 1, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE,
+Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE,
                       dest_folder = 'tests/save_tests', out_name = 'Ashop_DSM_2m')
 print(Sys.time()-st)
 raster::plot(Ashop_Ras, col=sun_rise())
@@ -68,9 +68,45 @@ raster::plot(NY20nw, col=sun_rise(),)
 NY <- get_OS_tile_10km(OS_10km_tile= c('NY20'), resolution = 1, model_type = 'DSM')
 raster::plot(NY20nw, col=sun_rise())
 
-# testing get_from_xy
 
-ScarPeak <- get_from_xy(xy=c(321555, 507208), radius = 500, resolution = 1, model_type = 'DSM')
+CheddarGorge <- get_from_xy(xy=c(347133, 154286), radius = 500, resolution = 1, model_type = 'DSM')
+raster::plot(CheddarGorge, col=fireburst())
+# testing get_from_xy
+# CheddarMine <- get_from_xy(xy=c(346117, 155276), radius = 500, resolution = 1, model_type = 'DSM')
+# raster::plot(CheddarMine, col=fireburst())
+
+BeachVis <- function(n=255){
+  pal <-colorRampPalette(c('#edc951', '#eb6841', '#cc2a36', '#4f372d', '#00a0b0'))
+  return(pal(n))
+}
+
+#plotting funciton
+plot_raster <- function(df){
+  data.frame(raster::rasterToPoints(df))%>%
+    ggplot(., aes_string(x = 'x', y='y', fill= colnames(.)[3])) +
+    geom_raster() +
+    scale_fill_gradientn(colours = BeachVis()) +
+    theme_void()+
+    theme(legend.position = "bottom", panel.background = element_rect(fill = "#44475a", color = "#44475a"),
+          panel.grid = element_blank(),
+          text = element_text(color = "#8be9fd"),
+          axis.line=element_blank(),
+          axis.text = element_blank(),
+          axis.ticks=element_blank(),
+          axis.title = element_blank(),
+          panel.border=element_blank(),
+          panel.spacing = unit(0, "cm"),
+          panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),
+          plot.margin = margin(0, 0, 0, 0, "cm"),
+          plot.caption = element_text(hjust=0.02, size=rel(2.2), color = "#FFFFFF"),
+          plot.background = element_rect(fill = "#44475a"))+
+    guides(color = FALSE, linetype = FALSE, fill = FALSE)
+}
+plot_raster(CheddarMine) %>%
+  ggsave(filename = 'tests/save_tests/Cheddar.jpg',., width=10, height=10, dpi=300)
+
+ScarPeak <- get_from_xy(xy=c(321555, 507208), radius = 600, resolution = 1, model_type = 'DSM')
 raster::plot(ScarPeak, col=sun_rise())
 
 library(rayshader)

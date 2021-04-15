@@ -76,10 +76,13 @@ scrape_token <- function(tile, chrome.version, remDr) {
 # function to initiate the chrome driver with selenium.
 start_selenium <- function(zipped_shps, chrome_v){
   eCaps <- list(chromeOptions = list(
-    args = c(
-      '--disable-gpu'
-      ,'--headless',
-      '--window-size=1280,800'
+    args = c("--headless",
+             "--disable-gpu",
+             "--window-size=1920,1200",
+             "--ignore-certificate-errors",
+             "--disable-extensions",
+             "--no-sandbox",
+             "--disable-dev-shm-usage"
     )
   ))
   rD <- RSelenium::rsDriver(browser = "chrome",
