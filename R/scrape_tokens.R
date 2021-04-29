@@ -90,7 +90,8 @@ start_selenium <- function(zipped_shps, chrome_v){
                             extraCapabilities = eCaps,
                             port =
                               as.integer(base::sample(seq(32768,65535, by=1),1)),
-                            verbose = FALSE)
+                            verbose = FALSE, geckover=NULL, iedrver=NULL,
+                            phantomver=NULL)
 
 
   # start the browser

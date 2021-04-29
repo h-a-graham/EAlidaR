@@ -113,7 +113,7 @@ the active R session (unless subsequently saved with
 <p float="left">
 
 <img src="/man/figures/AshopCover.png" width="49%" />
-<img src="/man/figures/AshopMap.png" width="49%" />
+<img src="/man/figures/AshopMap.png" width="40%" />
 
 </p>
 

@@ -26,7 +26,6 @@ Imports:
   progress,
   ggspatial,
   RSelenium,
-  stringdist,
-  stringi
+  stringdist
 Depends: 
     R (>= 2.10)
