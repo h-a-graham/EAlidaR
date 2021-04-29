@@ -5,49 +5,39 @@
 <img src="/man/figures/ScarfellHQ.png" width="60%">
 </p>
 
-**After a brief hiatus, {EAlidar} is back and now (theoretically) able
-to handle the dynamic URL download requests of the DEFRA portal. No
-doubt problems will crop up so please start up a
-[discussion](https://github.com/h-a-graham/EAlidaR/discussions) or
+**An R package to download EA LiDAR 'National LiDAR programme' (NLP) and 
+composite data for England. So you’re aware, Data downloaded with this package 
+is licensed under the 
+[Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
+This package is in a somewhat developmental state so if things aren't working 
+quite right, please start up a 
+[discussion](https://github.com/h-a-graham/EAlidaR/discussions) or 
 [submit an issue](https://github.com/h-a-graham/EAlidaR/issues)**
-
-An R package to download EA LiDAR 'National LiDAR programme' (NLP) and 
-composite data for England. So you’re aware, Data downloaded with this 
-package is licensed under the [Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
-This package is in a somewhat developmental state so if aren't working quite
-right, please start up a
-[discussion](https://github.com/h-a-graham/EAlidaR/discussions) or
-[submit an issue](https://github.com/h-a-graham/EAlidaR/issues)
 
 
 ### Background:
 
-The Environment Agency (EA) provide wonderful high resolution, open
-source elevation datasets for much of England. At present, the best way
+The Environment Agency (EA) provide wonderful high resolution, open 
+source elevation datasets for much of England. At present, the best way 
 to download this data is via the 
-[ESRI-based web map portal](https://environment.data.gov.uk/DefraDataDownload/?Mode=survey).
-This has numerous drawbacks - there are limits to the number of files
-that can be extracted at any given time, the spatial join between the
-requested area and available tiles is very slow and the data is provided
-in zipped files of varying raster formats (mainly ASCII and GeoTiff).
+[ESRI-based web map portal](https://environment.data.gov.uk/DefraDataDownload/?Mode=survey). 
+This has some drawbacks - there are limits to the number of files 
+that can be extracted at any given time, the spatial join between the 
+requested area and available tiles is very slow and the data is provided 
+in zipped files of varying raster formats (mainly ASCII and GeoTiff). 
 
-The purpose of this package is to provide a clean and easy way to
-download and interact directly with these excellent data in R. The
-challange here is that the download URLs for LiDAR tiles are not static.
+This package aims to provide a clean and easy way to download and interact 
+directly with these excellent data in R. The challenge here is that the 
+download URLs for LiDAR tiles are not static. 
 This package uses [{RSelenium}](https://github.com/ropensci/RSelenium) 
-to automate the uploading of Ordnance Survey tiles that intersect a requested area. At
-present, {EAlidar} only supports the chrome driver; you will
-therefore need to have Google Chrome installed on your machine to run
-this package. The Chrome driver version should be automatically detected 
-(not supported for Macs yet...); 
-if this fails, the user can provide the correct version as
-an argument.
+to automate the uploading of Ordnance Survey tiles that intersect a requested 
+area.
 
-Right now, this package only supports the most recent LiDAR data
-available. This includes the National LiDAR Programme (NLP) and
-Composite data. If 1m resolution is chosen, NLP data will be requested
-if available before searching composite data. If 0.25, 0.5 or 2m
-resolution is chosen, Composite data will be requested. I intend to add
+Right now, this package only supports the most recent LiDAR data 
+available. This includes the National LiDAR Programme (NLP) and 
+Composite data. If 1m resolution is chosen, NLP data will be requested 
+if available before searching composite data. If 0.25, 0.5 or 2m 
+resolution is chosen, Composite data will be requested. I intend to add 
 support for the time series data in the near future.
 
 
@@ -55,34 +45,53 @@ support for the time series data in the near future.
 
 `devtools::install_github('h-a-graham/EAlidaR')`
 
+### Dependencies
+At present, {EAlidar} only supports the chrome driver; you will therefore need 
+to install [Google Chrome](https://www.google.com/chrome/) to run this package.
+
+Selenium requires java, therefore make sure to install 
+[Java](https://www.java.com/en/download/) before installing {EAlidaR}.
+
 ### Checking for available data
 
-You can check the availability of data for your region by using
-`check_coverage` which returns a ggplot of the available coverage. To
-see national scale coverage use `national_covaerage`. However, at present
+You can check the availability of data for your region by using 
+`check_coverage` which returns a ggplot of the available coverage. To 
+see national scale coverage use `national_covaerage`. However, at present 
 these functions only display the Composite data, and don't include NLP 
-extents. For more information on data coverage see this [web portal](https://environment.maps.arcgis.com/apps/webappviewer/index.html?id=f765c2a97d644f08927d5cd5abe58d87)
+extents. For more information on data coverage see this 
+[web portal](https://environment.maps.arcgis.com/apps/webappviewer/index.html?id=f765c2a97d644f08927d5cd5abe58d87)
 
 ### A note on Selenium, JAVA and the Chrome driver...
 
-So, this package uses the `RSelenium::rsDriver()` function to open and manage the chrome driver.
-If you are getting errors relating to Rselenium then you may have to update/reinstall JAVA. In windows, remove the folder 
-'C:/ProgramData/Oracle', remove references to javapath in your Path Environment and then [reinstall java](https://www.java.com/en/download/). 
+So, this package uses the `RSelenium::rsDriver()` function to open and manage 
+the chrome driver. If you are getting errors relating to Rselenium then you may 
+have to update/reinstall Java. 
 
-The function `find_chrome_v()` can be used to retrieve your system's version of Chrome;
-this is a required argument for the download functions. However, the default is generated by find_chrome_v(). 
-If this function does not work on your OS (only tested on Windows and Linux) or returns an incorrect value,
-you can manually specify the version. To do this simply open chrome > menu button > help > About Google Chrome. 
-Then inspect the version number and then run `binman::list_versions('chromedriver')`. Select the driver version
-which most closely matches your machine's Google Chrome version and include it as a character string in the 
-'chrome_version' argument. Some issues still remain for OSX and MacOS...
+In windows, remove the folder 'C:/ProgramData/Oracle', remove references to 
+javapath in your Path Environment and then 
+[reinstall java](https://www.java.com/en/download/). 
+
+For Debian/Ubuntu the standard 
+[Java install](https://ubuntu.com/tutorials/install-jre#2-installing-openjre) 
+steps should be sufficient.
+
+The function `find_chrome_v()` can be used to retrieve your system's version of 
+Chrome;This function is the default value of the 'chrome_version' argument in 
+all the download functions. If this function does not work on your OS (only 
+tested on Windows and Ubuntu) or returns an incorrect value, you can manually 
+specify the version using the 'chrome_version' argument. To do this simply open 
+chrome > menu button > help > About Google Chrome. Then inspect the version 
+number and then run `binman::list_versions('chromedriver')`. Select the driver 
+version which most closely matches your machine's Google Chrome version and 
+include it as a character string in the 'chrome_version' argument. Some issues 
+still remain for OSX and MacOS...
 
 
 ### Examples:
 
 Here is a simple use case where we download the available 2m DTM data
 for one of the example regions provided with the package `Ashop_sf`.
-Using the `get_area` function, we retrieve a single raster as ‘merge_tiles’ is
+Using the `get_area()` function, we retrieve a single raster as ‘merge_tiles’ is
 TRUE. We can save this data in a desired location with ‘dest_folder’,
 ‘out_name’ and ‘ras_format’ arguments but, in this case, rasters are
 stored in the `tempfile()` location and will be available only during
@@ -108,15 +117,15 @@ the active R session (unless subsequently saved with
 
 </p>
 
-Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_10km()` 
-allow the users to specify 5 or 10m OS tile name(s) as a vector:
+Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_10km()` allow 
+the users to specify 5 or 10m Ordnance Survey (OS) tile name(s) as a vector:
 
     NY20nw <- get_OS_tile_5km(OS_5km_tile = c('NY20nw','NY10ne)', resolution = 1, model_type = 'DTM')
 
     NY20 <- get_OS_tile_10km(OS_10km_tile = 'NY20', resolution = 1, model_type = 'DTM')
 
-And the a final option to download data is with `get_from_xy()`. For now the XY coordinates must
-be provided in OSGB/British National Grid format:
+To download data around a specific location use `get_from_xy()`. The XY 
+coordinates must be provided in OSGB/British National Grid (Lat, Long) format:
 
     Scafell_Peak <- get_from_xy(xy=c(321555, 507208), radius = 500, resolution = 1, model_type = 'DSM')
 
