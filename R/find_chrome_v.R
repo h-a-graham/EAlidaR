@@ -23,12 +23,7 @@ find_chrome_v <- function(){
   }
 
   driver_check <- function(){
-    tryCatch(expr = {
-      binman::list_versions("chromedriver")[[1]]
-    }, error=function(e){
-      message("Attempting to install chrome drivers...")
-      wdman::chrome()
-    })
+
 
     tryCatch(expr = {
       n <- stringdist::amatch(v, binman::list_versions("chromedriver")[[1]], maxDist = 10)[1]
@@ -52,6 +47,14 @@ find_chrome_v <- function(){
       return(v)
     })
   }
+
+  tryCatch(expr = {
+    invisible(binman::list_versions("chromedriver")[[1]])
+  }, error=function(e){
+    message("Attempting to install chrome drivers...")
+    wdman::chrome()
+  })
+
   if (!v %in% binman::list_versions("chromedriver")[[1]]) {
     v <- driver_check()
   }
