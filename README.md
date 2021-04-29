@@ -13,7 +13,12 @@ doubt problems will crop up so please start up a
 
 An R package to download EA LiDAR 'National LiDAR programme' (NLP) and 
 composite data for England. So you’re aware, Data downloaded with this 
-package is licensed under the [Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
+package is licensed under the [Open Government License v 3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
+This package is in a somewhat developmental state so if aren't working quite
+right, please start up a
+[discussion](https://github.com/h-a-graham/EAlidaR/discussions) or
+[submit an issue](https://github.com/h-a-graham/EAlidaR/issues)
+
 
 ### Background:
 
