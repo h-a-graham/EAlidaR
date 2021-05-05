@@ -29,8 +29,6 @@ scrape_token <- function(tile, chrome.version, remDr) {
   #upload file
   webElem$sendKeysToElement(list(tile))
 
-
-
   wait_for_load(remDr)
 
   # click 'Get Tiles' button
@@ -125,6 +123,7 @@ compose_zip_paths <- function(save.folder, web.add){
 
 
 download_data <- function(web_url, dest_dir, os_tile_name, resolution, quiet=TRUE){
+  # message(web_url) # for debugging only.
   dest_path <- compose_zip_paths(dest_dir, web_url)
   download.file(url=web_url, destfile=dest_path, method='auto', quiet = T) # change quiet to true after testing
   return(dest_path)
@@ -248,7 +247,7 @@ get_data <- function(token_df, res, mod.type, save_dir){
   ras.obj <- merge_ostiles(dest_path)
 
   ras.obj@title <- os.tile
-
+  message(ras.obj)
   return(ras.obj)
 
 
