@@ -154,31 +154,43 @@ merge_ostiles <- function(ras.folder){
   }
 
   ras.list <- list.files(ras.folder)
+  message(ras.list)
 
   if (dir.exists(file.path(ras.folder,'index'))){
+    message("P1")
     ras.list <- ras.list[ras.list != 'index']
+    message(ras.list)
   }
 
   if (dir.exists(file.path(ras.folder,ras.list[1]))){
+    message("P2")
     ras.folder <- file.path(ras.folder,ras.list)
     ras.list <- list.files(ras.folder)
+    message(ras.list)
   }
 
   ras.list <- purrr::discard(ras.list , grepl(".tif.xml|.tfw|index", ras.list ))
-
+  message("P3")
+  message(ras.list)
   ras.list <- lapply(ras.list, join_paths, p2=ras.folder)
+  message("P4")
+  message(ras.list)
 
   if (length(ras.list) > 1){
+    message("P5")
     ras.list <- lapply(ras.list, read_raster)
+    message(ras.list)
+    message("P6")
     suppressWarnings(ras.merge <- do.call(raster::merge, ras.list))
+    message(ras.merge)
   } else if(length(ras.list) == 1){
-
+    message("P7")
     suppressWarnings(ras.merge <- raster::raster(file.path(ras.list[[1]])))
-
+    message(ras.merge)
   }
-
+  message("P8")
   suppressWarnings(raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700'))
-
+  message(ras.merge)
 
   return(ras.merge)
 }
