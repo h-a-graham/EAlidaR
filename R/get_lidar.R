@@ -30,9 +30,13 @@ missing_tiles_warn <- function(mod_type, res, tile_str){
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
+#' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
-get_area <- function(poly_area, resolution, model_type, chrome_version = NULL, merge_tiles=TRUE, crop=FALSE, dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
+                     merge_tiles=TRUE, crop=FALSE, dest_folder=NULL, out_name=NULL,
+                     ras_format="GTiff", headless_chrome=TRUE, check_selenium=TRUE){
 
   if (is.null(chrome_version)){
     chrome_version = find_chrome_v()
@@ -115,7 +119,8 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL, m
     gsub("([0-9]\\D+)", "\\L\\1",.,perl=TRUE)
 
   ras_list <- get_tiles(tile_list10km = tile_10km_inter, tile_list5km = tile_5km_inter, chrome_ver = chrome_version,
-                        resolution = resolution, mod_type=model_type)
+                        resolution = resolution, mod_type=model_type, headless_chrome=headless_chrome,
+                        check_selenium = check_selenium)
 
   # remove any NA values produced  by missing tiles
   error_list <- unlist(purrr::map(ras_list, purrr::pluck, "error", "message"))
@@ -201,10 +206,12 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL, m
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
+#' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_OS_tile_5km <- function(OS_5km_tile, resolution, model_type, chrome_version=NULL, merge_tiles=TRUE,
-                            dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+                            dest_folder=NULL, out_name=NULL, ras_format="GTiff", headless_chrome=TRUE, check_selenium=TRUE){
 
   OS_tile_name <- toupper(OS_5km_tile)
 
@@ -214,7 +221,8 @@ get_OS_tile_5km <- function(OS_5km_tile, resolution, model_type, chrome_version=
     sf::st_buffer(-1)
 
   out_ras <- get_area(poly_area=tile_sf, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
-                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format)
+                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format,
+                      headless_chrome, check_selenium)
 
   return(out_ras)
 }
@@ -234,10 +242,12 @@ get_OS_tile_5km <- function(OS_5km_tile, resolution, model_type, chrome_version=
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
+#' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_version=NULL, merge_tiles=TRUE,
-                            dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+                            dest_folder=NULL, out_name=NULL, ras_format="GTiff", headless_chrome=TRUE, check_selenium=TRUE){
 
   OS_tile_name <- toupper(OS_10km_tile)
 
@@ -247,7 +257,8 @@ get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_versio
     sf::st_buffer(-1)
 
   out_ras <- get_area(poly_area=tile_sf, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
-                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format)
+                      merge_tiles=merge_tiles, crop=FALSE, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format,
+                      headless_chrome, check_selenium)
 
   return(out_ras)
 }
@@ -270,10 +281,13 @@ get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_versio
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
 #' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
+#' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
 #' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_from_xy <- function(xy, radius, resolution, model_type, chrome_version = NULL,
-                        merge_tiles=TRUE, crop=TRUE, dest_folder=NULL, out_name=NULL, ras_format="GTiff"){
+                        merge_tiles=TRUE, crop=TRUE, dest_folder=NULL, out_name=NULL, ras_format="GTiff",
+                        headless_chrome=TRUE, check_selenium=TRUE){
 
   point <- sf::st_point(xy)
 
@@ -283,7 +297,8 @@ get_from_xy <- function(xy, radius, resolution, model_type, chrome_version = NUL
     sf::st_buffer(., radius)
 
   out_ras <- get_area(poly_area=req_area, resolution=resolution, model_type=model_type, chrome_version=chrome_version,
-                      merge_tiles=merge_tiles, crop=crop, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format)
+                      merge_tiles=merge_tiles, crop=crop, dest_folder=dest_folder, out_name=out_name, ras_format=ras_format,
+                      headless_chrome, check_selenium)
 
   return(out_ras)
 

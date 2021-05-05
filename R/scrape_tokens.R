@@ -74,10 +74,9 @@ scrape_token <- function(tile, chrome.version, remDr) {
 }
 
 # function to initiate the chrome driver with selenium.
-start_selenium <- function(zipped_shps, chrome_v){
+start_selenium <- function(zipped_shps, chrome_v, headless, check_s){
   eCaps <- list(chromeOptions = list(
-    args = c("--headless",
-             "--disable-gpu",
+    args = c("--disable-gpu",
              "--window-size=1920,1200",
              "--ignore-certificate-errors",
              "--disable-extensions",
@@ -85,13 +84,18 @@ start_selenium <- function(zipped_shps, chrome_v){
              "--disable-dev-shm-usage"
     )
   ))
+
+  if (isTRUE(headless)){
+    eCaps$chromeOptions$args <- c("--headless", eCaps$chromeOptions$args)
+  }
+
   rD <- RSelenium::rsDriver(browser = "chrome",
                             chromever = chrome_v,
                             extraCapabilities = eCaps,
                             port =
                               as.integer(base::sample(seq(32768,65535, by=1),1)),
                             verbose = FALSE, geckover=NULL, iedrver=NULL,
-                            phantomver=NULL)
+                            phantomver=NULL, check=check_s)
 
 
   # start the browser
@@ -252,7 +256,9 @@ get_data <- function(token_df, res, mod.type, save_dir){
 
 
 
-get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_type, merge_tiles = TRUE, ras_format = "GTiff"){
+get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution,
+                      mod_type, merge_tiles = TRUE, ras_format = "GTiff",
+                      headless_chrome, check_selenium){
 
 
   dest_folder <- tempdir()
@@ -266,7 +272,7 @@ get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_t
 
   message('Scraping web portal tile tokens...')
   arc_tokens <- zip_shp_list %>%
-    purrr::map(., ~ start_selenium(zipped_shps = ., chrome_v = chrome_ver))
+    purrr::map(., ~ start_selenium(zipped_shps = ., chrome_v = chrome_ver, headless = headless_chrome, check_s=check_selenium))
 
   token_df <- tibble::as_tibble(tile_list10km) %>%
     dplyr::rename(grid_name10km = value) %>%
