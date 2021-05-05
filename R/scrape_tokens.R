@@ -123,7 +123,7 @@ compose_zip_paths <- function(save.folder, web.add){
 
 
 download_data <- function(web_url, dest_dir, os_tile_name, resolution, quiet=TRUE){
-  # message(web_url) # for debugging only.
+  message(web_url) # for debugging only.
   dest_path <- compose_zip_paths(dest_dir, web_url)
   download.file(url=web_url, destfile=dest_path, method='auto', quiet = T) # change quiet to true after testing
   return(dest_path)
