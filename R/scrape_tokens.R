@@ -126,6 +126,7 @@ download_data <- function(web_url, dest_dir, os_tile_name, resolution, quiet=TRU
   message(web_url) # for debugging only.
   dest_path <- compose_zip_paths(dest_dir, web_url)
   download.file(url=web_url, destfile=dest_path, method='auto', quiet = T) # change quiet to true after testing
+  message(dest_path)
   return(dest_path)
 
 }
@@ -237,12 +238,15 @@ get_data <- function(token_df, res, mod.type, save_dir){
     }
   }
 
+  message(tile_data)
 
   if(is.null(tile_data)){
     stop(os.tile)
   }
 
   dest_path <- (unzip_files(tile_data))
+
+  message(dest_path)
 
   ras.obj <- merge_ostiles(dest_path)
 
