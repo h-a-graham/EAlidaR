@@ -21,7 +21,7 @@ devtools::load_all()
 devtools::document()
 library(sf)
 
-
+ras <- get_from_xy(xy=c(198222, 56775), radius = 1000, resolution=1, model_type = 'DSM')
 
 st <- Sys.time()
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE,

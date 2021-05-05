@@ -13,7 +13,9 @@ get_area(
   crop = FALSE,
   dest_folder = NULL,
   out_name = NULL,
-  ras_format = "GTiff"
+  ras_format = "GTiff",
+  headless_chrome = TRUE,
+  check_selenium = TRUE
 )
 }
 \arguments{
@@ -34,6 +36,10 @@ get_area(
 \item{out_name}{Character required when saving merged raster to dest.folder.}
 
 \item{ras_format}{Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()}
+
+\item{headless_chrome}{Boolean with default TRUE. if FALSE chrome is run with GUI activated.}
+
+\item{check_selenium}{Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.}
 }
 \value{
 A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE

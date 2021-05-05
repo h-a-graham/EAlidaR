@@ -29,8 +29,6 @@ scrape_token <- function(tile, chrome.version, remDr) {
   #upload file
   webElem$sendKeysToElement(list(tile))
 
-
-
   wait_for_load(remDr)
 
   # click 'Get Tiles' button
@@ -74,10 +72,9 @@ scrape_token <- function(tile, chrome.version, remDr) {
 }
 
 # function to initiate the chrome driver with selenium.
-start_selenium <- function(zipped_shps, chrome_v){
+start_selenium <- function(zipped_shps, chrome_v, headless, check_s){
   eCaps <- list(chromeOptions = list(
-    args = c("--headless",
-             "--disable-gpu",
+    args = c("--disable-gpu",
              "--window-size=1920,1200",
              "--ignore-certificate-errors",
              "--disable-extensions",
@@ -85,13 +82,18 @@ start_selenium <- function(zipped_shps, chrome_v){
              "--disable-dev-shm-usage"
     )
   ))
+
+  if (isTRUE(headless)){
+    eCaps$chromeOptions$args <- c("--headless", eCaps$chromeOptions$args)
+  }
+
   rD <- RSelenium::rsDriver(browser = "chrome",
                             chromever = chrome_v,
                             extraCapabilities = eCaps,
                             port =
                               as.integer(base::sample(seq(32768,65535, by=1),1)),
                             verbose = FALSE, geckover=NULL, iedrver=NULL,
-                            phantomver=NULL)
+                            phantomver=NULL, check=check_s)
 
 
   # start the browser
@@ -122,7 +124,7 @@ compose_zip_paths <- function(save.folder, web.add){
 
 download_data <- function(web_url, dest_dir, os_tile_name, resolution, quiet=TRUE){
   dest_path <- compose_zip_paths(dest_dir, web_url)
-  download.file(url=web_url, destfile=dest_path, method='auto', quiet = T) # change quiet to true after testing
+  download.file(url=web_url, destfile=dest_path, method='auto', quiet = T)
   return(dest_path)
 
 }
@@ -141,7 +143,7 @@ merge_ostiles <- function(ras.folder){
   # functions required for tile merging...
   read_raster <- function(ras.path){
     suppressWarnings(ras <- raster::raster(ras.path))
-    suppressWarnings(raster::crs(ras) <- sp::CRS('+init=EPSG:27700')) #'+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +units=m +no_defs'
+    suppressWarnings(raster::crs(ras) <- sf::st_crs(27700)$wkt)
     return(ras)
   }
 
@@ -161,20 +163,15 @@ merge_ostiles <- function(ras.folder){
   }
 
   ras.list <- purrr::discard(ras.list , grepl(".tif.xml|.tfw|index", ras.list ))
-
   ras.list <- lapply(ras.list, join_paths, p2=ras.folder)
 
   if (length(ras.list) > 1){
     ras.list <- lapply(ras.list, read_raster)
     suppressWarnings(ras.merge <- do.call(raster::merge, ras.list))
   } else if(length(ras.list) == 1){
-
     suppressWarnings(ras.merge <- raster::raster(file.path(ras.list[[1]])))
-
   }
-
-  suppressWarnings(raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700'))
-
+  suppressWarnings(raster::crs(ras.merge)<- sf::st_crs(27700)$wkt)
 
   return(ras.merge)
 }
@@ -234,7 +231,6 @@ get_data <- function(token_df, res, mod.type, save_dir){
     }
   }
 
-
   if(is.null(tile_data)){
     stop(os.tile)
   }
@@ -246,13 +242,13 @@ get_data <- function(token_df, res, mod.type, save_dir){
   ras.obj@title <- os.tile
 
   return(ras.obj)
-
-
 }
 
 
 
-get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_type, merge_tiles = TRUE, ras_format = "GTiff"){
+get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution,
+                      mod_type, merge_tiles = TRUE, ras_format = "GTiff",
+                      headless_chrome, check_selenium){
 
 
   dest_folder <- tempdir()
@@ -266,7 +262,7 @@ get_tiles <- function(tile_list10km, tile_list5km, chrome_ver, resolution, mod_t
 
   message('Scraping web portal tile tokens...')
   arc_tokens <- zip_shp_list %>%
-    purrr::map(., ~ start_selenium(zipped_shps = ., chrome_v = chrome_ver))
+    purrr::map(., ~ start_selenium(zipped_shps = ., chrome_v = chrome_ver, headless = headless_chrome, check_s=check_selenium))
 
   token_df <- tibble::as_tibble(tile_list10km) %>%
     dplyr::rename(grid_name10km = value) %>%
