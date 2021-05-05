@@ -145,7 +145,7 @@ merge_ostiles <- function(ras.folder){
   # functions required for tile merging...
   read_raster <- function(ras.path){
     suppressWarnings(ras <- raster::raster(ras.path))
-    suppressWarnings(raster::crs(ras) <- sp::CRS('+init=EPSG:27700')) #'+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +units=m +no_defs'
+    suppressWarnings(raster::crs(ras) <- sf::st_crs(27700)$wkt)
     return(ras)
   }
 
@@ -189,7 +189,7 @@ merge_ostiles <- function(ras.folder){
     message(ras.merge)
   }
   message("P8")
-  suppressWarnings(raster::crs(ras.merge)<- sp::CRS('+init=EPSG:27700'))
+  suppressWarnings(raster::crs(ras.merge)<- sf::st_crs(27700)$wkt)
   message(ras.merge)
 
   return(ras.merge)
