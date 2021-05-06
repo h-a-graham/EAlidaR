@@ -2,7 +2,7 @@
 # EAlidaR
 
 <p align="center">
-<img src="/man/figures/ScarfellHQ.png" width="60%">
+<img src="/man/figures/HexLogov1.png" width="60%">
 </p>
 
 **An R package to download EA LiDAR 'National LiDAR programme' (NLP) and 
@@ -41,16 +41,16 @@ resolution is chosen, Composite data will be requested. I intend to add
 support for the time series data in the near future.
 
 
-### Installation
-
-`devtools::install_github('h-a-graham/EAlidaR')`
-
 ### Dependencies
 At present, {EAlidar} only supports the chrome driver; you will therefore need 
 to install [Google Chrome](https://www.google.com/chrome/) to run this package.
 
 Selenium requires java, therefore make sure to install 
 [Java](https://www.java.com/en/download/) before installing {EAlidaR}.
+
+### Installation
+
+`devtools::install_github('h-a-graham/EAlidaR')`
 
 ### Checking for available data
 
@@ -59,13 +59,17 @@ You can check the availability of data for your region by using
 see national scale coverage use `national_covaerage`. However, at present 
 these functions only display the Composite data, and don't include NLP 
 extents. For more information on data coverage see this 
-[web portal](https://environment.maps.arcgis.com/apps/webappviewer/index.html?id=f765c2a97d644f08927d5cd5abe58d87)
+[web portal](https://environment.maps.arcgis.com/apps/webappviewer/index.html?id=f765c2a97d644f08927d5cd5abe58d87).
+At present composite data coverage for 1 m and 2 m resolutions is 87% and 81% 
+respectively. With the inclusion of NLP data this is even higher! 
+[More info here](https://experience.arcgis.com/experience/753ad2ebd3554fa696885b8c366c3049/page/page_16/?views=view_23)
 
 ### A note on Selenium, JAVA and the Chrome driver...
 
 So, this package uses the `RSelenium::rsDriver()` function to open and manage 
-the chrome driver. If you are getting errors relating to Rselenium then you may 
-have to update/reinstall Java. 
+the chrome driver. If you are getting errors relating to 
+[{Rselenium}](https://github.com/ropensci/RSelenium) then you may have to 
+update/reinstall Java. 
 
 In windows, remove the folder 'C:/ProgramData/Oracle', remove references to 
 javapath in your Path Environment and then 
@@ -99,10 +103,9 @@ the active R session (unless subsequently saved with
 `raster::writeRaster`).
 
     library(EAlidaR)
-    
-    
+
     # national_coverage(model_type = 'DSM', resolution = 2) # quite slow by the way...
-    check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 2)
+    # check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 2) 
     
     Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', 
                           merge_tiles=TRUE, crop=TRUE)
@@ -110,11 +113,8 @@ the active R session (unless subsequently saved with
     raster::plot(Ashop_Ras, col=sun_rise())
     plot(Ashop_sf, add = TRUE)
 
-<p float="left">
-
-<img src="/man/figures/AshopCover.png" width="49%" />
-<img src="/man/figures/AshopMap.png" width="40%" />
-
+<p float="centre">
+<img src="/man/figures/AshopMap.png" width="65%" />
 </p>
 
 Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_10km()` allow 
@@ -128,7 +128,6 @@ To download data around a specific location use `get_from_xy()`. The XY
 coordinates must be provided in OSGB/British National Grid (Lat, Long) format:
 
     Scafell_Peak <- get_from_xy(xy=c(321555, 507208), radius = 500, resolution = 1, model_type = 'DSM')
-
 
 ## Some Extras...
 
@@ -154,52 +153,13 @@ FALSE if you don’t want to use multiprocessing.
 
 ![Ashop Rayshader Example](/man/figures/AshopRayshade.png)
 
-Now for a smaller example; the code below uses the built in
-`UniOfExeter_sf` polygon to download 1m DSM data for the Streatham
-campus region and then visualise with rayshader…
-
-    ExeUniRas <- get_area(poly_area = UniOfExeter_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
-    
-    ExeUniMat = raster_to_matrix(ExeUniRas)
-    
-    ExeUniMat %>%
-      sphere_shade(texture = "bw") %>%
-      add_shadow(ray_shade(ExeUniMat, zscale = 1, multicore = TRUE), 0.3) %>%
-      add_shadow(ambient_shade(ExeUniMat, multicore=TRUE), 0.1) %>%
-      plot_3d(ExeUniMat, zscale = 1.4, fov = 60, theta = 50, phi = 20, windowsize = c(1000, 800), zoom = 0.3,
-              solid = FALSE)
-    
-    Sys.sleep(0.2)
-    render_depth(focus = 0.7, focallength = 70, clear = TRUE)
-
-![Exeter Uni Example](/man/figures/UoeRayshade.png)
-
-If you really want to melt your computer ;) why not build a 3d model of
-Exeter City with the `Exeter_sf` dataset:
-
-    ExeterRas <- get_area(poly_area = Exeter_sf, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
-    
-    ExeterMat = raster_to_matrix(ExeterRas)
-    
-    ExeterMat %>%
-      sphere_shade(texture = "bw") %>%
-      add_shadow(ray_shade(ExeterMat, zscale = 1, multicore =TRUE), 0.3) %>%
-      add_shadow(ambient_shade(ExeterMat, multicore=TRUE), 0) %>%
-      plot_3d(ExeterMat, zscale = 1.5, fov = 60, theta = 45, phi = 20, windowsize = c(1000, 800), zoom = 0.2,
-              solid = FALSE)
-    
-    Sys.sleep(0.2)
-    render_snapshot(clear = TRUE)
-
-![Exeter City Example](/man/figures/ExeterRayshade.png)
 
 And finally…In some parts of England you can download \<1m resolution
 data - here is an example using the `city_of_london_sf`
 
-    CoL_Ras <- get_area(poly_area = city_of_london_sf, resolution = 0.5, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
-    
-    
-    CoL_Mat = raster_to_matrix(CoL_Ras)
+    CoL <- get_from_xy(xy=c(532489 , 181358), radius = 500, resolution=0.5, model_type = 'DSM')
+
+    CoL_Mat = raster_to_matrix(CoL)
     
     CoL_Mat %>%
       sphere_shade(texture = "bw") %>%

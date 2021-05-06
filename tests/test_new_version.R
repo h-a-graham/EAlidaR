@@ -16,7 +16,6 @@
 # consider adding parallel functionality for scraping - will improve speed but make error handling trickier?
 
 
-
 devtools::load_all()
 devtools::document()
 library(sf)
@@ -127,7 +126,6 @@ ScarMat %>%
 Sys.sleep(0.2)
 render_depth(focus = 0.6, focallength = 60, clear = FALSE, filename = 'man/figures/Scarfell.png')
 render_highquality(filename = 'man/figures/ScarfellHQ.png')
-
 
 
 # coverage tests
