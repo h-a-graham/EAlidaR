@@ -7,26 +7,6 @@
 #' @source digitised in QGIS
 "Ashop_sf"
 
-
-#' An sf object of the Exeter City Area
-#'
-#' A polygon sf object for the outline of the City of Exeter
-#'
-#' @format An sf object with a single feature
-#'
-#' @source ONS - https://data.gov.uk/dataset/7879ab82-2863-401e-8a29-a56e264d2182/major-towns-and-cities-december-2015-boundaries
-"Exeter_sf"
-
-
-#' An sf object of the University of Exeter Streatham Campus
-#'
-#' A polygon sf object for the approximate outline of the UoE main campus
-#'
-#' @format An sf object with a single feature
-#'
-#' @source digitised in QGIS
-"UniOfExeter_sf"
-
 #' An sf object of the City of London Borough
 #'
 #' A polygon sf object for the boundary of the City of London borough
