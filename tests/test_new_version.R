@@ -20,6 +20,11 @@ devtools::load_all()
 devtools::document()
 library(sf)
 
+
+
+
+
+
 ras <- get_from_xy(xy=c(198222, 56775), radius = 1000, resolution=1, model_type = 'DSM')
 
 st <- Sys.time()
@@ -127,6 +132,20 @@ Sys.sleep(0.2)
 render_depth(focus = 0.6, focallength = 60, clear = FALSE, filename = 'man/figures/Scarfell.png')
 render_highquality(filename = 'man/figures/ScarfellHQ.png')
 
+#
+CoL <- get_from_xy(xy=c(532489 , 181358), radius = 500, resolution=0.5, model_type = 'DSM')
+
+CoL_Mat = raster_to_matrix(CoL)
+
+CoL_Mat %>%
+  sphere_shade(texture = "bw") %>%
+  add_shadow(ray_shade(CoL_Mat, zscale = 1, multicore =TRUE), 0.3) %>%
+  add_shadow(ambient_shade(CoL_Mat, multicore=TRUE), 0.1) %>%
+  plot_3d(CoL_Mat, zscale = 1, fov = 60, theta = 20, phi = 30, windowsize = c(1000, 800), zoom = 0.3,
+          solid = FALSE)
+
+Sys.sleep(0.2)
+render_depth(focus = 0.7, focallength = 70, clear = FALSE, filename = 'man/figures/CoLRayshade.png')
 
 # coverage tests
 
@@ -136,9 +155,5 @@ national_coverage('DSM', 1)
 
 #crs issue:
 
-sf::st_crs(UniOfExeter_sf) == sf::st_crs(sf::st_transform(UniOfExeter_sf, 27700))
 
-UoEwgs <- sf::st_transform(UniOfExeter_sf, 4326)
-
-sf::st_crs(UoEwgs) == sf::st_crs(sf::st_transform(UoEwgs, 27700))
 

@@ -2,7 +2,7 @@
 # EAlidaR
 
 <p align="center">
-<img src="/man/figures/HexLogov1.png" width="60%">
+<img src="/man/figures/HexLogov1.png" width="30%">
 </p>
 
 **An R package to download EA LiDAR 'National LiDAR programme' (NLP) and 
