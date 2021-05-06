@@ -113,7 +113,7 @@ the active R session (unless subsequently saved with
     raster::plot(Ashop_Ras, col=sun_rise())
     plot(Ashop_sf, add = TRUE)
 
-<p float="centre">
+<p float="center">
 <img src="/man/figures/AshopMap.png" width="45%">
 </p>
 
