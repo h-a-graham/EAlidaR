@@ -133,6 +133,7 @@ coordinates must be provided in OSGB/British National Grid (Lat, Long) format:
 
 And just to really show off how great this data is, here are some 3D
 examples with the brilliant [{rayshader} package](https://github.com/tylermorganwall/rayshader). 
+
 First let’s try out the Ashop Valley data we downloaded previously. Note that multicore is set
 to TRUE, in these examples, as they are quite large rasters - set to
 FALSE if you don’t want to use multiprocessing.
@@ -154,8 +155,8 @@ FALSE if you don’t want to use multiprocessing.
 ![Ashop Rayshader Example](/man/figures/AshopRayshade.png)
 
 
-And finally…In some parts of England you can download \<1m resolution
-data - here is an example using the `city_of_london_sf`
+In some parts of England you can download \<1m resolution data - here is an 
+example using the for the City of London using the `get_from_xy()` function
 
     CoL <- get_from_xy(xy=c(532489 , 181358), radius = 500, resolution=0.5, model_type = 'DSM')
 
