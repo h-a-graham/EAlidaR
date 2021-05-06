@@ -114,7 +114,7 @@ the active R session (unless subsequently saved with
     plot(Ashop_sf, add = TRUE)
 
 <p float="centre">
-<img src="/man/figures/AshopMap.png" width="65%" />
+<img src="/man/figures/AshopMap.png" width="45%">
 </p>
 
 Alternatively, the functions `get_OS_tile_5km()` and `get_OS_tile_10km()` allow 
