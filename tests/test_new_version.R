@@ -25,8 +25,8 @@ library(sf)
 
 
 
-ras <- get_from_xy(xy=c(198222, 56775), radius = 1000, resolution=1, model_type = 'DSM')
-
+ras <- get_from_xy(xy=c(198222, 56775), radius = 500, resolution=2, model_type = 'DTM')
+raster::plot(ras)
 st <- Sys.time()
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE,
                       dest_folder = 'tests/save_tests', out_name = 'Ashop_DSM_2m')
@@ -133,7 +133,8 @@ render_depth(focus = 0.6, focallength = 60, clear = FALSE, filename = 'man/figur
 render_highquality(filename = 'man/figures/ScarfellHQ.png')
 
 #
-CoL <- get_from_xy(xy=c(532489 , 181358), radius = 500, resolution=0.5, model_type = 'DSM')
+devtools::load_all()
+CoL <- get_from_xy(xy=c(532489 , 181358), radius = 500, resolution=1, model_type = 'DTM')
 
 CoL_Mat = raster_to_matrix(CoL)
 
