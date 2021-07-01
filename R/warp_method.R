@@ -16,7 +16,7 @@ warp_method <- function(ras.list){
                    destination = merge_path)
 
     outras <- terra::rast(merge_path)
-    message('warp worked!')
+    # message('warp worked!')
     return(outras)
   },
   error = function(e) {
