@@ -55,10 +55,9 @@ Selenium requires java, therefore make sure to install
 ### Checking for available data
 
 You can check the availability of data for your region by using 
-`check_coverage` which returns a ggplot of the available coverage. To 
-see national scale coverage use `national_covaerage`. However, at present 
-these functions only display the Composite data, and don't include NLP 
-extents. For more information on data coverage see this 
+`check_coverage`. To see national scale coverage use `national_covaerage`. At 
+present, these functions only display the <2019 Composite data, and don't 
+include NLP extents. For more information on data coverage see this 
 [web portal](https://environment.maps.arcgis.com/apps/webappviewer/index.html?id=f765c2a97d644f08927d5cd5abe58d87).
 At present composite data coverage for 1 m and 2 m resolutions is 87% and 81% 
 respectively. With the inclusion of NLP data this is even higher! 
