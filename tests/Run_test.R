@@ -2,19 +2,20 @@ devtools::document()
 devtools::load_all()
 
 # library(EAlidaR)
-library(ggplot2)
-library(ggspatial)
 library(sf)
 library(rayshader)
 
 # -------------- check cover example --------------
-
+check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 1)
 check_coverage(poly_area = Ashop_sf, model_type = 'DSM', resolution = 2)
+
+check_coverage(poly_area = city_of_london_sf, model_type = 'DSM', resolution = 1)
+check_coverage(poly_area = city_of_london_sf, model_type = 'DSM', resolution = 0.25)
+check_coverage(poly_area = city_of_london_sf, model_type = 'DSM', resolution = 0.5)
 # ggsave(filename = 'man/figures/AshopCover.png', dpi = 600)
 
-
 national_coverage(model_type = 'DTM', resolution = 2)
-
+national_coverage(model_type = 'DSM', resolution = 1)
 # ---------- Ashop download and map example ------------------
 save_folder <- 'C:/HG_Projects/SideProjects/EALidarCheck/EADownloadTEST/test2'
 save_folder2 <- 'tests/save_tests'

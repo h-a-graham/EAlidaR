@@ -42,6 +42,7 @@ model_res_check <- function(.model, .res){
 #' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2.
 #' @return A ggplot object - map of coverage requested and subtitle detailing proportion of cover.
 #' @export
+
 check_coverage <- function(poly_area, model_type, resolution){
   oldw <- getOption("warn")
   options(warn = -1)
@@ -79,23 +80,12 @@ check_coverage <- function(poly_area, model_type, resolution){
   requested_area <- sf::st_area(sf_geom)
   perc_cover <- round(cover_int_area/requested_area*100, 1)
 
-  cover_plot <- ggplot2::ggplot() +
-    ggspatial::annotation_map_tile(type = "cartolight", zoomin = -1, ) +
-    ggspatial::layer_spatial(cover_int, ggplot2::aes(fill='Available Data'), alpha = 0.5, colour=NA)+
-    ggspatial::layer_spatial(sf_geom, ggplot2::aes(colour ='Requested Area'),alpha = 0.5, fill=NA)+
-
-    ggplot2::scale_fill_manual(values = c("#09D517")) +
-
-    ggplot2::scale_colour_manual(values = c('black')) +
-
-    ggplot2::coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
-
-    ggplot2::labs(subtitle = sprintf('%s %% LiDAR %s m %s coverage for requested area', perc_cover, resolution, model_type)) +
-    ggplot2::theme(legend.title=ggplot2::element_blank())
-
   options(warn = oldw) # reset old warning settings
 
-  return(cover_plot)
+  plot(sf::st_geometry(sf_geom), border='#d95f02', axes=T, lwd=2,
+       sub=sprintf('%s %% LiDAR %s m %s coverage for requested area', perc_cover, resolution, model_type))
+  plot(sf::st_geometry(cover_int), col=scales::alpha('#1b9e77',0.9), border='grey', axes=T, alpha=1, add=T)
+  legend("bottomleft", inset=.02, c('Requested Area', 'Available Data'), fill=c('#d95f02', '#1b9e77'), horiz=TRUE, cex=0.8)
 
 }
 
@@ -107,28 +97,15 @@ check_coverage <- function(poly_area, model_type, resolution){
 #' @param resolution a numeric value (in meters) of either: 0.25, 0.5, 1 or 2
 #' @return A ggplot object - map of coverage requested and subtitle detailing % cover.
 #' @export
+
 national_coverage <- function(model_type, resolution){
   oldw <- getOption("warn")
   options(warn = -1)
 
   #check resolution and import the relevant coverage sf
   cover_sf <- model_res_check(.model = model_type, .res = resolution)
-
-  fill_lab <- sprintf('Available %s m Data', resolution)
-  cover_plot <- ggplot2::ggplot() +
-    ggspatial::annotation_map_tile(type = "cartolight", zoomin = -1, ) +
-    ggspatial::layer_spatial(cover_sf, ggplot2::aes(fill=fill_lab), alpha = 0.5, colour=NA)+
-
-    ggplot2::scale_fill_manual(values = c("#09D517")) +
-
-    ggplot2::scale_colour_manual(values = c('black')) +
-
-    ggplot2::coord_sf(crs = 27700, datum = sf::st_crs(27700)) +
-
-    ggplot2::labs(subtitle = sprintf('Extent of Available LiDAR %s m %s composite data', resolution, model_type)) +
-    ggplot2::theme(legend.title=ggplot2::element_blank())
-
   options(warn = oldw) # reset old warning settings
 
-  return(cover_plot)
+  plot(sf::st_geometry(cover_sf), col='#7570b3', axes=T,border = 'grey', lwd=0.1,
+       sub=sprintf('Extent of Available LiDAR %s m %s composite data', resolution, model_type))
 }
