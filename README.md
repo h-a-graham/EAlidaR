@@ -109,7 +109,7 @@ the active R session (unless subsequently saved with
     Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', 
                           merge_tiles=TRUE, crop=TRUE)
     
-    raster::plot(Ashop_Ras, col=sun_rise())
+    terra::plot(Ashop_Ras, col=sun_rise())
     plot(Ashop_sf, add = TRUE)
 
 <p float="center">
@@ -139,7 +139,7 @@ FALSE if you don’t want to use multiprocessing.
 
     library(rayshader)
     
-    AshopMat = raster_to_matrix(Ashop_Ras) 
+    AshopMat = raster_to_matrix(raster::raster(Ashop_Ras)) 
     
     AshopMat %>%
       sphere_shade(texture = "imhof1") %>%
@@ -159,7 +159,7 @@ example using the for the City of London using the `get_from_xy()` function
 
     CoL <- get_from_xy(xy=c(532489 , 181358), radius = 500, resolution=0.5, model_type = 'DSM')
 
-    CoL_Mat = raster_to_matrix(CoL)
+    CoL_Mat = raster_to_matrix(raster::raster(CoL))
     
     CoL_Mat %>%
       sphere_shade(texture = "bw") %>%

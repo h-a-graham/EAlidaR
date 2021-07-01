@@ -3,7 +3,7 @@ warp_method <- function(ras.list){
   # wrapped with try catch - if gdal warp fails defaults to raster::merge
   out_ras <- tryCatch({
 
-    if (is.character(class(ras.list[[1]]))) {
+    if (class(ras.list[[1]])=='character') {
       src_list <- as.character(ras.list)
     } else {
       src_list <- lapply(ras.list, FUN=function(x) terra::sources(x[[1]])[,1]) %>%
