@@ -189,6 +189,8 @@ get_data <- function(token_df, res, mod.type, save_dir){
         download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2020-%s.zip', arc_web_id, res.str, os.tile)
         suppressWarnings(try(tile_data <- download_data(web_url=download_url, dest_dir=save_dir, os_tile_name=os.tile, resolution=res), silent=TRUE))
       }
+      # if (!is.null(tile_data)) message('Composite 2020 - found')
+      # if (is.null(tile_data)) message('No composite 2020 - Attempting NLP Data')
       st_year <- 2020
       while(is.null(tile_data)){
         if (st_year == 2016) break;

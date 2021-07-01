@@ -35,11 +35,11 @@ area.
 
 Right now, this package only supports the most recent LiDAR data 
 available. This includes the National LiDAR Programme (NLP) and 
-Composite data. If 1m resolution is chosen, NLP data will be requested 
-if available before searching composite data. If 0.25, 0.5 or 2m 
-resolution is chosen, Composite data will be requested. I intend to add 
-support for the time series data in the near future.
-
+Composite data. If 1m resolution is chosen, The 2020 Composite will be 
+requested for DTM data; if the composite isn't available, NLP data will be 
+requested. The DSM composite 2020/2019 has not yet been released. Therefore NLP, 
+data is first requested before searching the 2017 composite. If 0.25, 0.5 or 2m 
+resolution is chosen, Composite data will be requested. 
 
 ### Dependencies
 At present, {EAlidar} only supports the chrome driver; you will therefore need 
