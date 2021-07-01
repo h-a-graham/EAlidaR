@@ -141,37 +141,32 @@ unzip_files <- function(dest_path){
 
 merge_ostiles <- function(ras.folder){
   # functions required for tile merging...
-  read_raster <- function(ras.path){
-    suppressWarnings(ras <- raster::raster(ras.path))
-    suppressWarnings(raster::crs(ras) <- sf::st_crs(27700)$wkt)
-    return(ras)
-  }
-
   join_paths <- function(p1, p2){
     file.path(p2, p1)
   }
 
-  ras.list <- list.files(ras.folder)
-
-  if (dir.exists(file.path(ras.folder,'index'))){
-    ras.list <- ras.list[ras.list != 'index']
-  }
+  ras.list <- list.files(ras.folder) %>%
+  purrr::discard(. , grepl("index|lidar_used_in_merging_process", . ))
 
   if (dir.exists(file.path(ras.folder,ras.list[1]))){
     ras.folder <- file.path(ras.folder,ras.list)
     ras.list <- list.files(ras.folder)
   }
 
-  ras.list <- purrr::discard(ras.list , grepl(".tif.xml|.tfw|index", ras.list ))
-  ras.list <- lapply(ras.list, join_paths, p2=ras.folder)
+  ras.list <- list.files(ras.folder) %>%
+    purrr::discard(. , grepl(".tif.xml|.tfw|index|lidar_used_in_merging_process",
+                             . )) %>%
+    lapply(., join_paths, p2=ras.folder)
 
-  if (length(ras.list) > 1){
-    ras.list <- lapply(ras.list, read_raster)
-    suppressWarnings(ras.merge <- do.call(raster::merge, ras.list))
-  } else if(length(ras.list) == 1){
-    suppressWarnings(ras.merge <- raster::raster(file.path(ras.list[[1]])))
-  }
-  suppressWarnings(raster::crs(ras.merge)<- sf::st_crs(27700)$wkt)
+
+if (length(ras.list) > 1){
+  ras.merge <- warp_method(ras.list)
+
+} else if(length(ras.list) == 1){
+  suppressWarnings(ras.merge <- terra::rast(file.path(ras.list[[1]])))
+}
+
+  suppressWarnings(terra::crs(ras.merge)<- sf::st_crs(27700)$wkt)
 
   return(ras.merge)
 }
@@ -194,6 +189,12 @@ get_data <- function(token_df, res, mod.type, save_dir){
   tile_data <- NULL
   if (mod.type == 'DTM'){
     if (res == 1){
+      if (is.null(tile_data)){
+        download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2020-%s.zip', arc_web_id, res.str, os.tile)
+        suppressWarnings(try(tile_data <- download_data(web_url=download_url, dest_dir=save_dir, os_tile_name=os.tile, resolution=res), silent=TRUE))
+      }
+      # if (!is.null(tile_data)) message('Composite 2020 - found')
+      # if (is.null(tile_data)) message('No composite 2020 - Attempting NLP Data')
       st_year <- 2020
       while(is.null(tile_data)){
         if (st_year == 2016) break;
@@ -201,18 +202,15 @@ get_data <- function(token_df, res, mod.type, save_dir){
         st_year <- st_year-1
         suppressWarnings(try(tile_data <- download_data(web_url=download_url, dest_dir=save_dir, os_tile_name=os.tile, resolution=res), silent=TRUE))
       }
-      if (is.null(tile_data)){
-        download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2019-%s.zip', arc_web_id, res.str, os.tile)
-        suppressWarnings(try(tile_data <- download_data(web_url=download_url, dest_dir=save_dir, os_tile_name=os.tile, resolution=res), silent=TRUE))
-      }
+
     } else if (res == 2) {
-      download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2019-%s.zip', arc_web_id, res.str, os.tile)
+      download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-2020-%s.zip', arc_web_id, res.str, os.tile)
       suppressWarnings(try(tile_data <- download_data(web_url=download_url, dest_dir=save_dir, os_tile_name=os.tile, resolution=res), silent=TRUE))
     } else if (res == 0.25 || res == 0.5){
       download_url <- sprintf('https://environment.data.gov.uk/UserDownloads/interactive/%s/LIDARCOMP/LIDAR-DTM-%s-%s.zip', arc_web_id, res.str, os.tile)
       suppressWarnings(try(tile_data <- download_data(web_url=download_url, dest_dir=save_dir, os_tile_name=os.tile, resolution=res), silent=TRUE))
     }
-  } else if (mod.type == 'DSM') { # NEED TO ADD NLP DSM OPTION HERE...
+  } else if (mod.type == 'DSM') {
     if (res == 1){
       st_year <- 2020
       while(is.null(tile_data)){
@@ -239,7 +237,7 @@ get_data <- function(token_df, res, mod.type, save_dir){
 
   ras.obj <- merge_ostiles(dest_path)
 
-  ras.obj@title <- os.tile
+  names(ras.obj) <- paste(os.tile, mod.type, res.str, sep="_")
 
   return(ras.obj)
 }
