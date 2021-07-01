@@ -4,8 +4,8 @@ is_absolute_path <- function(path) {
 
 
 resave_rasters <- function(ras, folder, ras_format){
-  save_name <- ras@title
-  out_ras <- suppressWarnings(raster::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW")))
+  save_name <- names(ras)
+  out_ras <- suppressWarnings(terra::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW")))
   return(out_ras)
 }
 
@@ -29,10 +29,10 @@ missing_tiles_warn <- function(mod_type, res, tile_str){
 #' @param crop Boolean with default FALSE. If TRUE data outside the bounds of the requested polygon area are discarded.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
-#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run terra::gdal(drivers=T)
 #' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
 #' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
-#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @return A SpatRaster (from {terra}) object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
                      merge_tiles=TRUE, crop=FALSE, dest_folder=NULL, out_name=NULL,
@@ -94,9 +94,9 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
   }
 
 
-  rasformats <- raster::writeFormats()[,1]
+  rasformats <- terra::gdal(drivers=T)[,1]
   if (!(ras_format %in% rasformats)){
-    stop('Requested Raster format not supported. Use raster::writeFormats() to view supported drivers')
+    stop('Requested Raster format not supported. Use terra::gdal(drivers=T) to view supported drivers')
   }
 
 
@@ -144,7 +144,8 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
   if (isTRUE(merge_tiles)){
     if (length(ras_list) > 1){
       message('Merging Rasters...')
-      ras_merge <- suppressWarnings(do.call(raster::merge, ras_list))
+      ras_merge <- warp_method(ras_list)
+      # ras_merge <- suppressWarnings(do.call(raster::merge, ras_list))
     } else if(length(ras_list) == 1){
 
       ras_merge <- ras_list[[1]]
@@ -153,11 +154,11 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
 
     if (isTRUE(crop)){
       message('Cropping Raster...')
-      ras_merge <- suppressWarnings(raster::crop(ras_merge, sf_geom))
+      ras_merge <- suppressWarnings(terra::crop(ras_merge, sf_geom))
     }
 
     if (isTRUE(save.tile)){
-      ras_merge <- suppressWarnings(raster::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
+      ras_merge <- suppressWarnings(terra::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
                                        overwrite=TRUE, options = c("COMPRESS=LZW")))
     }
     if (isTRUE(errs_flagged)){
@@ -205,10 +206,10 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
-#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run terra::gdal(drivers=T)
 #' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
 #' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
-#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @return A SpatRaster (from {terra}) object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_OS_tile_5km <- function(OS_5km_tile, resolution, model_type, chrome_version=NULL, merge_tiles=TRUE,
                             dest_folder=NULL, out_name=NULL, ras_format="GTiff", headless_chrome=TRUE, check_selenium=TRUE){
@@ -241,10 +242,10 @@ get_OS_tile_5km <- function(OS_5km_tile, resolution, model_type, chrome_version=
 #' @param merge_tiles Boolean with default TRUE. If TRUE a single raster object is returned else a list of raster is produced.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
-#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run terra::gdal(drivers=T)
 #' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
 #' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
-#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @return A SpatRaster (from {terra}) object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_version=NULL, merge_tiles=TRUE,
                             dest_folder=NULL, out_name=NULL, ras_format="GTiff", headless_chrome=TRUE, check_selenium=TRUE){
@@ -280,10 +281,10 @@ get_OS_tile_10km <- function(OS_10km_tile, resolution, model_type, chrome_versio
 #' @param crop Boolean with default FALSE. If TRUE data outside the bounds of the requested polygon area are discarded.
 #' @param dest_folder Optional character string for output save folder. If not provided rasters will be stored in tempfile()
 #' @param out_name Character required when saving merged raster to dest.folder.
-#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()
+#' @param ras_format Character for Raster format. Default is 'GTiff'. for available formats run terra::gdal(drivers=T)
 #' @param headless_chrome Boolean with default TRUE. if FALSE chrome is run with GUI activated.
 #' @param check_selenium Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.
-#' @return A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+#' @return A SpatRaster (from {terra}) object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 #' @export
 get_from_xy <- function(xy, radius, resolution, model_type, chrome_version = NULL,
                         merge_tiles=TRUE, crop=TRUE, dest_folder=NULL, out_name=NULL, ras_format="GTiff",

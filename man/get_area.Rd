@@ -35,14 +35,14 @@ get_area(
 
 \item{out_name}{Character required when saving merged raster to dest.folder.}
 
-\item{ras_format}{Character for Raster format. Default is 'GTiff'. for available formats run raster::writeFormats()}
+\item{ras_format}{Character for Raster format. Default is 'GTiff'. for available formats run terra::gdal(drivers=T)}
 
 \item{headless_chrome}{Boolean with default TRUE. if FALSE chrome is run with GUI activated.}
 
 \item{check_selenium}{Boolean with default TRUE. If FAlSE {Rselenium} will not check for updated drivers.}
 }
 \value{
-A Raster object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
+A SpatRaster (from {terra}) object when merge.tiles = TRUE or a list of rasters when merge.tiles = FALSE
 }
 \description{
 This function downloads Raster data from the DEFRA portal \url{https://environment.data.gov.uk/DefraDataDownload/?Mode=survey}.

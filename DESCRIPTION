@@ -16,7 +16,7 @@ Imports:
   dplyr,
   sf,
   sp,
-  raster,
+  terra,
   tools,
   zip,
   tibble,

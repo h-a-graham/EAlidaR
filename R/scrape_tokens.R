@@ -141,14 +141,16 @@ unzip_files <- function(dest_path){
 
 merge_ostiles <- function(ras.folder){
   # functions required for tile merging...
-  read_raster <- function(ras.path){
-    suppressWarnings(ras <- raster::raster(ras.path))
-    suppressWarnings(raster::crs(ras) <- sf::st_crs(27700)$wkt)
-    return(ras)
-  }
-
   join_paths <- function(p1, p2){
     file.path(p2, p1)
+  }
+
+  ras.list <- list.files(ras.folder) %>%
+  purrr::discard(. , grepl("index|lidar_used_in_merging_process", . ))
+
+  if (dir.exists(file.path(ras.folder,ras.list[1]))){
+    ras.folder <- file.path(ras.folder,ras.list)
+    ras.list <- list.files(ras.folder)
   }
 
   ras.list <- list.files(ras.folder) %>%
@@ -156,13 +158,15 @@ merge_ostiles <- function(ras.folder){
                              . )) %>%
     lapply(., join_paths, p2=ras.folder)
 
-  if (length(ras.list) > 1){
-    ras.list <- lapply(ras.list, read_raster)
-    suppressWarnings(ras.merge <- do.call(raster::merge, ras.list))
-  } else if(length(ras.list) == 1){
-    suppressWarnings(ras.merge <- raster::raster(file.path(ras.list[[1]])))
-  }
-  suppressWarnings(raster::crs(ras.merge)<- sf::st_crs(27700)$wkt)
+
+if (length(ras.list) > 1){
+  ras.merge <- warp_method(ras.list)
+
+} else if(length(ras.list) == 1){
+  suppressWarnings(ras.merge <- terra::rast(file.path(ras.list[[1]])))
+}
+
+  suppressWarnings(terra::crs(ras.merge)<- sf::st_crs(27700)$wkt)
 
   return(ras.merge)
 }
@@ -233,7 +237,7 @@ get_data <- function(token_df, res, mod.type, save_dir){
 
   ras.obj <- merge_ostiles(dest_path)
 
-  ras.obj@title <- os.tile
+  names(ras.obj) <- paste(os.tile, mod.type, res.str, sep="_")
 
   return(ras.obj)
 }

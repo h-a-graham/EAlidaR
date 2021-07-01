@@ -134,9 +134,10 @@ render_highquality(filename = 'man/figures/ScarfellHQ.png')
 
 #
 devtools::load_all()
-CoL <- get_from_xy(xy=c(532489 , 181358), radius = 500, resolution=1, model_type = 'DTM')
+CoL <- get_from_xy(xy=c(532489 , 181358), radius = 1500, resolution=0.5, model_type = 'DTM')
+CoL3 <- get_from_xy(xy=c(532489 , 181358), radius = 2000, resolution=0.5, model_type = 'DSM')
 
-CoL_Mat = raster_to_matrix(CoL)
+CoL_Mat = raster_to_matrix(CoL3)
 
 CoL_Mat %>%
   sphere_shade(texture = "bw") %>%
