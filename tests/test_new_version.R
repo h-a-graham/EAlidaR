@@ -20,61 +20,63 @@ devtools::load_all()
 devtools::document()
 library(sf)
 
+#test1 coverage plots.
+check_coverage(Ashop_sf, 'DSM', 2)
 
+national_coverage('DSM', 1)
 
-
-
-
+#test 2 simple xy request.
 ras <- get_from_xy(xy=c(198222, 56775), radius = 500, resolution=2, model_type = 'DTM')
-raster::plot(ras)
+ras2 <- get_from_xy(xy=c(198222, 56775), radius = 500, resolution=2, model_type = 'DTM',
+                    dest_folder = 'tests/save_tests', out_name = 'testy1')
+terra::plot(ras)
+terra::plot(ras2)
+
+#test3 request using sf object.
 st <- Sys.time()
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE,
                       dest_folder = 'tests/save_tests', out_name = 'Ashop_DSM_2m')
 print(Sys.time()-st)
-raster::plot(Ashop_Ras, col=sun_rise())
-plot(Ashop_sf,
-     add = TRUE)
+terra::plot(Ashop_Ras, col=sun_rise())
+plot(st_geometry(Ashop_sf), add = TRUE, col=NA)
 
 
-# scafell
+# test4 request from gpkg file.
+#
+# Scafell_sf <- st_read('QGIS/vectors/Scafell.gpkg')
+#
+# st <- Sys.time()
+# Scafel_ras <-  get_area(poly_area = Scafell_sf, resolution = 1, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE)
+# print(Sys.time()-st)
+#
+#
+# terra::plot(Scafel_ras, col=night_sky())
+# plot(Scafell_sf, add = TRUE)
 
-Scafell_sf <- st_read('QGIS/vectors/Scafell.gpkg')
-
-
-st <- Sys.time()
-Scafel_ras <-  get_area(poly_area = Scafell_sf, resolution = 1, model_type = 'DTM', merge_tiles=TRUE, crop=TRUE)
-print(Sys.time()-st)
-
-
-raster::plot(Scafel_ras, col=night_sky())
-plot(Scafell_sf,
-     add = TRUE)
-
-UoEtrans <- sf::st_transform(UniOfExeter_sf, 4326)
+# test5  input sf in different CRS.
+coltrans <- sf::st_transform(city_of_london_sf, 4326)
 
 st <- Sys.time()
-ExeUniRas <-  get_area(poly_area = UoEtrans, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
+CoLRas <-  get_area(poly_area = coltrans, resolution = 1, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
 print(Sys.time()-st)
 
-raster::plot(ExeUniRas, col=sun_rise())
-plot(UniOfExeter_sf,
-     add = TRUE)
+terra::plot(CoLRas, col=night_sky())
+plot(st_geometry(city_of_london_sf), add = TRUE)
 
 
-# testing get_OS_tile_5km
+# test6 testing get_OS_tile_5km
 
 NY20nw <- get_OS_tile_5km(OS_5km_tile= c('NY20nw'), resolution = 1, model_type = 'DSM')
-raster::plot(NY20nw, col=sun_rise(),)
+terra::plot(NY20nw, col=sun_rise(),)
 
 
-?get_OS_tile_5km
-
+#test7 check get_OS_tile_10km
 NY <- get_OS_tile_10km(OS_10km_tile= c('NY20'), resolution = 1, model_type = 'DSM')
-raster::plot(NY20nw, col=sun_rise())
+terra::plot(NY20nw, col=sun_rise())
 
-
+### Random tests probably not required.
 CheddarGorge <- get_from_xy(xy=c(347133, 154286), radius = 500, resolution = 1, model_type = 'DSM')
-raster::plot(CheddarGorge, col=fireburst())
+terra::plot(CheddarGorge, col=fireburst())
 # testing get_from_xy
 # CheddarMine <- get_from_xy(xy=c(346117, 155276), radius = 500, resolution = 1, model_type = 'DSM')
 # raster::plot(CheddarMine, col=fireburst())
