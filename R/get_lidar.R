@@ -5,7 +5,7 @@ is_absolute_path <- function(path) {
 
 resave_rasters <- function(ras, folder, ras_format){
   save_name <- names(ras)
-  out_ras <- suppressWarnings(terra::writeRaster(ras, file.path(folder, save_name), format=ras_format, overwrite=TRUE, options = c("COMPRESS=LZW")))
+  out_ras <- suppressWarnings(terra::writeRaster(ras, file.path(folder, save_name), filetype=ras_format, overwrite=TRUE))
   return(out_ras)
 }
 
@@ -158,8 +158,8 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
     }
 
     if (isTRUE(save.tile)){
-      ras_merge <- suppressWarnings(terra::writeRaster(ras_merge, file.path(dest_folder, out_name), format=ras_format,
-                                       overwrite=TRUE, options = c("COMPRESS=LZW")))
+      ras_merge <- suppressWarnings(terra::writeRaster(ras_merge, file.path(dest_folder, out_name), filetype=ras_format,
+                                       overwrite=TRUE))
     }
     if (isTRUE(errs_flagged)){
       missing_tiles_warn(mod_type=model_type, res=resolution, tile_str=error_list)
