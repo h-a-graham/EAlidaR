@@ -6,7 +6,7 @@ warp_method <- function(ras.list){
     if (class(ras.list[[1]])=='character') {
       src_list <- as.character(ras.list)
     } else {
-      src_list <- lapply(ras.list, FUN=function(x) terra::sources(x[[1]])[,1]) %>%
+      src_list <- lapply(ras.list, FUN=function(x) terra::sources(x)) %>%
         as.character()
     }
 

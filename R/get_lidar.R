@@ -65,7 +65,7 @@ get_area <- function(poly_area, resolution, model_type, chrome_version = NULL,
   in_poly_crs <- sf::st_crs(sf_geom)
 
   sf_geom <- sf_geom %>%
-    sf::st_transform(27700)
+    sf::st_transform(st_crs(grid_5km_sf))
 
   if (in_poly_crs != sf::st_crs(sf_geom)){
     message('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\

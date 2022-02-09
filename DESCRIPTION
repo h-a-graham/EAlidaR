@@ -1,6 +1,6 @@
 Package: EAlidaR
 Title: Download EA LiDAR composite datasets directly into R
-Version: 0.0.3.0
+Version: 0.0.3.1
 Authors@R: 
     person(given = "Hugh",
            family = "Graham",
@@ -16,7 +16,7 @@ Imports:
   dplyr,
   sf,
   sp,
-  terra,
+  terra (>= 1.5.11),
   tools,
   zip,
   tibble,
