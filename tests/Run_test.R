@@ -4,7 +4,7 @@ devtools::load_all()
 # library(EAlidaR)
 library(sf)
 library(rayshader)
-
+library(terra)
 # -------------- check cover example --------------
 check_coverage(poly_area = Ashop_sf, model_type = 'DTM', resolution = 1)
 check_coverage(poly_area = Ashop_sf, model_type = 'DSM', resolution = 2)
@@ -23,7 +23,7 @@ save_folder2 <- 'tests/save_tests'
 
 # area_withfail <- read_sf(system.file("extdata", "Test_Area3.gpkg", package = "EAlidaR"))
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DTM',
-                      merge_tiles=TRUE, crop=TRUE)
+                      merge_tiles=TRUE, crop=T)
 
 Ashop_Ras <- get_area(poly_area = Ashop_sf, resolution = 2, model_type = 'DSM', merge_tiles=TRUE, crop=TRUE)
                       # dest_folder = save_folder2, out_name = 'test1') #, dest.folder = save_folder, out.name = 'TESTAREA'

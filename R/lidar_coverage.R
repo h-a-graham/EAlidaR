@@ -61,7 +61,7 @@ check_coverage <- function(poly_area, model_type, resolution){
   in_poly_crs <- sf::st_crs(sf_geom)
 
   sf_geom <- sf_geom %>%
-    sf::st_transform(27700)
+    sf::st_transform(st_crs(cover_sf))
 
   if (in_poly_crs != sf::st_crs(sf_geom)){
     message('Warning: The polygon feature CRS provided is not British National Grid (EPSG:27700)\

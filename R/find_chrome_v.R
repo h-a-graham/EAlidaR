@@ -25,7 +25,7 @@ find_chrome_v <- function(){
   driver_check <- function(){
 
     tryCatch(expr = {
-      n <- stringdist::amatch(v, binman::list_versions("chromedriver")[[1]], maxDist = 10)[1]
+      n <- stringdist::amatch(v, binman::list_versions("chromedriver")[[1]], maxDist = 5)[1]
       v <- binman::list_versions("chromedriver")[[1]][n]
 
       message(sprintf("No exact chrome driver match was found using: %s
