@@ -5,6 +5,17 @@
 <img src="/man/figures/HexLogov1.png" width="30%">
 </p>
 
+
+** THIS PACKAGE IS NOW NOT WORKING DUE TO THE DEFRA PORTAL MOVING FROM THE ESRI PORTAL TO THE NEW OGC VERSION. DEVELOPMENT WILL CONTINUE AT:
+https://github.com/h-a-graham/gblidar WHERE WE HOPE TO BUILD ON THE OGC API **
+
+
+
+
+
+
+
+
 **An R package to download EA LiDAR 'National LiDAR programme' (NLP) and 
 composite data for England. So you’re aware, Data downloaded with this package 
 is licensed under the 
